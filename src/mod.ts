@@ -413,10 +413,10 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
         const buffs = db.globals.config.Health.Effects.Stimulator.Buffs
 
         //ID buff paracetamol -> 67150653e2809bdac7054f97
-        //ID buff exodrine    -> 67352799ac0f173f618601ff
+        //ID buff exodrine    -> 673780fffa6d1a8ee8c3c405
 
         buffs["67150653e2809bdac7054f97"] = paracetamol;
-        buffs["67352799ac0f173f618601ff"] = exodrine;
+        buffs["673780fffa6d1a8ee8c3c405"] = exodrine;
 
 
         for(const itemFile in mydb.templates.items) {
