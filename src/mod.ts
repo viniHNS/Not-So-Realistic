@@ -9,8 +9,9 @@ import { VFS } from "@spt/utils/VFS";
 import { ImporterUtil } from "@spt/utils/ImporterUtil";
 import path from "path";
 import { IDHelper } from "./IDHelper";
-import config from "../config/config.json"
-import paracetamol from "../db/buffs/paracetamol.json"
+import medsConfig from "../config/medsConfig.json";
+import recoilConfig from "../config/recoilConfig.json";
+import paracetamol from "../db/buffs/paracetamol.json";
 
 class Mod implements IPostDBLoadMod, IPreSptLoadMod
 {
@@ -65,23 +66,23 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
             setEffectDamage(item, "LightBleeding", `${prefix}LightBleedingHealCost`, config);
         }
 
-        const carKitHP: number = config.carKitHP;
-        const salewaHP: number = config.salewaHP;
-        const ifakHP: number = config.ifakHP;
-        const afakHP: number = config.afakHP;
-        const grizzlyHP: number = config.grizzlyHP;
-        const ai2HP: number = config.ai2HP;
+        const carKitHP: number = medsConfig.carKitHP;
+        const salewaHP: number = medsConfig.salewaHP;
+        const ifakHP: number = medsConfig.ifakHP;
+        const afakHP: number = medsConfig.afakHP;
+        const grizzlyHP: number = medsConfig.grizzlyHP;
+        const ai2HP: number = medsConfig.ai2HP;
     
-        const calocUsage: number = config.calocUsage;
-        const armyBandageUsage: number = config.armyBandageUsage;
-        const analginPainkillersUsage: number = config.analginPainkillersUsage;
-        const augmentinUsage: number = config.augmentinUsage;
-        const ibuprofenUsage: number = config.ibuprofenUsage;
-        const vaselinUsage: number = config.vaselinUsage;
-        const goldenStarUsage: number = config.goldenStarUsage;
-        const aluminiumSplintUsage: number = config.aluminiumSplintUsage;
-        const cmsUsage: number = config.cmsUsage;
-        const survivalKitUsage: number = config.survivalKitUsage;
+        const calocUsage: number = medsConfig.calocUsage;
+        const armyBandageUsage: number = medsConfig.armyBandageUsage;
+        const analginPainkillersUsage: number = medsConfig.analginPainkillersUsage;
+        const augmentinUsage: number = medsConfig.augmentinUsage;
+        const ibuprofenUsage: number = medsConfig.ibuprofenUsage;
+        const vaselinUsage: number = medsConfig.vaselinUsage;
+        const goldenStarUsage: number = medsConfig.goldenStarUsage;
+        const aluminiumSplintUsage: number = medsConfig.aluminiumSplintUsage;
+        const cmsUsage: number = medsConfig.cmsUsage;
+        const survivalKitUsage: number = medsConfig.survivalKitUsage;
 
 
         // Find the meds item by its Id (thanks NoNeedName)
@@ -108,10 +109,10 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
         
         // Changes --------------------------------------------------------------------
         
-        if (config.grizzlyChanges) {
-            applyChanges(grizzly, config, "Grizzly");
+        if (medsConfig.grizzlyChanges) {
+            applyChanges(grizzly, medsConfig, "Grizzly");
             grizzly._props.MaxHpResource = grizzlyHP;
-            logger2.logWithColor(`[Making Meds Great Again!] Changing Grizzly`, LogTextColor.GREEN);
+            logger2.logWithColor(`[Not So Realistic] Changing Grizzly`, LogTextColor.GREEN);
         } else {
             grizzly._props.effects_damage["LightBleeding"] = {
                 delay: 0,
@@ -144,13 +145,13 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
                 cost: 0
             }
             grizzly._props.MaxHpResource = 1800;
-            logger2.logWithColor(`[Making Meds Great Again!] Grizzly set to default`, LogTextColor.GREEN);
+            logger2.logWithColor(`[Not So Realistic] Grizzly set to default`, LogTextColor.GREEN);
         }
         
-        if (config.ai2Changes) {
-            applyChanges(ai2, config, "ai2");
+        if (medsConfig.ai2Changes) {
+            applyChanges(ai2, medsConfig, "ai2");
             ai2._props.MaxHpResource = ai2HP;
-            logger2.logWithColor(`[Making Meds Great Again!] Changing AI-2`, LogTextColor.GREEN);
+            logger2.logWithColor(`[Not So Realistic] Changing AI-2`, LogTextColor.GREEN);
         } else {
             ai2._props.effects_damage["RadExposure"] = {
                 delay: 0,
@@ -159,13 +160,13 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
                 cost: 0
             }
             ai2._props.MaxHpResource = 100;
-            logger2.logWithColor(`[Making Meds Great Again!] AI-2 set to default`, LogTextColor.GREEN);
+            logger2.logWithColor(`[Not So Realistic] AI-2 set to default`, LogTextColor.GREEN);
         }
         
-        if (config.carKitChanges) {
-            applyChanges(carKit, config, "carKit");
+        if (medsConfig.carKitChanges) {
+            applyChanges(carKit, medsConfig, "carKit");
             carKit._props.MaxHpResource = carKitHP;
-            logger2.logWithColor(`[Making Meds Great Again!] Changing Car First Aid Kit`, LogTextColor.GREEN);
+            logger2.logWithColor(`[Not So Realistic] Changing Car First Aid Kit`, LogTextColor.GREEN);
         } else {
             carKit._props.effects_damage["LightBleeding"] = {
                 delay: 0,
@@ -174,13 +175,13 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
                 cost: 50
             }
             carKit._props.MaxHpResource = 220;
-            logger2.logWithColor(`[Making Meds Great Again!] Car First Aid Kit set to default`, LogTextColor.GREEN);
+            logger2.logWithColor(`[Not So Realistic] Car First Aid Kit set to default`, LogTextColor.GREEN);
         }
         
-        if (config.salewaChanges) {
-            applyChanges(salewa, config, "salewa");
+        if (medsConfig.salewaChanges) {
+            applyChanges(salewa, medsConfig, "salewa");
             salewa._props.MaxHpResource = salewaHP;
-            logger2.logWithColor(`[Making Meds Great Again!] Changing Salewa`, LogTextColor.GREEN);
+            logger2.logWithColor(`[Not So Realistic] Changing Salewa`, LogTextColor.GREEN);
         } else {
             salewa._props.effects_damage["LightBleeding"] = {
                 delay: 0,
@@ -195,13 +196,13 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
                 cost: 175
             },
             salewa._props.MaxHpResource = 400;
-            logger2.logWithColor(`[Making Meds Great Again!] Salewa set to default`, LogTextColor.GREEN);
+            logger2.logWithColor(`[Not So Realistic] Salewa set to default`, LogTextColor.GREEN);
         }
         
-        if (config.ifakChanges) {
-            applyChanges(ifak, config, "ifak");
+        if (medsConfig.ifakChanges) {
+            applyChanges(ifak, medsConfig, "ifak");
             ifak._props.MaxHpResource = ifakHP;
-            logger2.logWithColor(`[Making Meds Great Again!] Changing IFAK`, LogTextColor.GREEN);
+            logger2.logWithColor(`[Not So Realistic] Changing IFAK`, LogTextColor.GREEN);
         } else {
             ifak._props.effects_damage["LightBleeding"] = {
                 delay: 0,
@@ -222,13 +223,13 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
                 cost: 0
             }
             ifak._props.MaxHpResource = 300;
-            logger2.logWithColor(`[Making Meds Great Again!] IFAK set to default`, LogTextColor.GREEN);
+            logger2.logWithColor(`[Not So Realistic] IFAK set to default`, LogTextColor.GREEN);
         }
         
-        if (config.afakChanges) {
-            applyChanges(afak, config, "afak");
+        if (medsConfig.afakChanges) {
+            applyChanges(afak, medsConfig, "afak");
             afak._props.MaxHpResource = afakHP;
-            logger2.logWithColor(`[Making Meds Great Again!] Changing AFAK`, LogTextColor.GREEN);
+            logger2.logWithColor(`[Not So Realistic] Changing AFAK`, LogTextColor.GREEN);
         } else {
             afak._props.effects_damage["LightBleeding"] = {
                 delay: 0,
@@ -249,7 +250,7 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
                 cost: 0
             }
             afak._props.MaxHpResource = 400;
-            logger2.logWithColor(`[Making Meds Great Again!] AFAK set to default`, LogTextColor.GREEN);
+            logger2.logWithColor(`[Not So Realistic] AFAK set to default`, LogTextColor.GREEN);
         }
 
         calocB._props.MaxHpResource = calocUsage;
@@ -275,9 +276,9 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
         kriss_9mm._props.bFirerate = 1200;
 
         // Changes in the Recoil of the weapons ------------------------------------------------
-        tables.globals.config.Aiming.RecoilCrank = config.recoilCrank;
-        tables.globals.config.Aiming.RecoilDamping = config.recoilDamping;
-        tables.globals.config.Aiming.RecoilHandDamping = config.recoilHandDamping;
+        tables.globals.config.Aiming.RecoilCrank = recoilConfig.recoilCrank;
+        tables.globals.config.Aiming.RecoilDamping = recoilConfig.recoilDamping;
+        tables.globals.config.Aiming.RecoilHandDamping = recoilConfig.recoilHandDamping;
         tables.globals.config.Aiming.RecoilVertBonus = 10;
         tables.globals.config.Aiming.RecoilBackBonus = 10;
 
@@ -288,83 +289,92 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
                 if(weapClass == "" || weapClass == null || type == "Node"){
                     continue;
                 } else {
- 
-                    if(weapClass == "smg"){
+                    const recoilConfigMap = {
+                        smg: {
+                            RecoilUp: recoilConfig.smgRecoilUp,
+                            RecoilBack: recoilConfig.smgRecoilBack,
+                            RecoilConvergence: recoilConfig.smgRecoilConvergence,
+                            Dispersion: recoilConfig.smgDispersion,
+                            RecoilHandDamping: recoilConfig.recoilHandDamping,
+                            RecoilCamera: recoilConfig.smgRecoilCamera,
+                            RecoilCategoryMultiplierHandRotation: recoilConfig.smgRecoilCategoryMultiplierHandRotation,
+                            RecoilStableAngleIncreaseStep: recoilConfig.smgRecoilStableAngleIncreaseStep
+                        },
+                        assaultRifle: {
+                            RecoilUp: recoilConfig.assaultRifleRecoilUp,
+                            RecoilBack: recoilConfig.assaultRifleRecoilBack,
+                            RecoilConvergence: recoilConfig.assaultRifleRecoilConvergence,
+                            Dispersion: recoilConfig.assaultRifleDispersion,
+                            RecoilHandDamping: recoilConfig.recoilHandDamping,
+                            RecoilCamera: recoilConfig.assaultRifleRecoilCamera,
+                            RecoilCategoryMultiplierHandRotation: recoilConfig.assaultRifleRecoilCategoryMultiplierHandRotation,
+                            RecoilStableAngleIncreaseStep: recoilConfig.assaultRifleRecoilStableAngleIncreaseStep
+                        },
+                        sniperRifle: {
+                            RecoilUp: recoilConfig.sniperRifleRecoilUp,
+                            RecoilBack: recoilConfig.sniperRifleRecoilBack,
+                            RecoilConvergence: recoilConfig.sniperRifleRecoilConvergence,
+                            Dispersion: recoilConfig.sniperRifleDispersion,
+                            RecoilHandDamping: recoilConfig.recoilHandDamping,
+                            RecoilCamera: recoilConfig.sniperRifleRecoilCamera,
+                            RecoilCategoryMultiplierHandRotation: recoilConfig.sniperRifleRecoilCategoryMultiplierHandRotation,
+                            RecoilStableAngleIncreaseStep: recoilConfig.sniperRifleRecoilStableAngleIncreaseStep
+                        },
+                        marksmanRifle: {
+                            RecoilUp: recoilConfig.marksmanRifleRecoilUp,
+                            RecoilBack: recoilConfig.marksmanRifleRecoilBack,
+                            RecoilConvergence: recoilConfig.marksmanRifleRecoilConvergence,
+                            Dispersion: recoilConfig.marksmanRifleDispersion,
+                            RecoilHandDamping: recoilConfig.recoilHandDamping,
+                            RecoilCamera: recoilConfig.marksmanRifleRecoilCamera,
+                            RecoilCategoryMultiplierHandRotation: recoilConfig.marksmanRifleRecoilCategoryMultiplierHandRotation,
+                            RecoilStableAngleIncreaseStep: recoilConfig.marksmanRifleRecoilStableAngleIncreaseStep
+                        },
+                        pistol: {
+                            RecoilUp: recoilConfig.pistolRecoilUp,
+                            RecoilBack: recoilConfig.pistolRecoilBack,
+                            RecoilConvergence: recoilConfig.pistolRecoilConvergence,
+                            Dispersion: recoilConfig.pistolDispersion,
+                            RecoilHandDamping: recoilConfig.recoilHandDamping,
+                            RecoilCamera: recoilConfig.pistolRecoilCamera,
+                            RecoilCategoryMultiplierHandRotation: recoilConfig.pistolRecoilCategoryMultiplierHandRotation,
+                            RecoilStableAngleIncreaseStep: recoilConfig.pistolRecoilStableAngleIncreaseStep
+                        },
+                        machinegun: {
+                            RecoilUp: recoilConfig.machinegunRecoilUp,
+                            RecoilBack: recoilConfig.machinegunRecoilBack,
+                            RecoilConvergence: recoilConfig.machinegunRecoilConvergence,
+                            Dispersion: recoilConfig.machinegunDispersion,
+                            RecoilHandDamping: recoilConfig.recoilHandDamping,
+                            RecoilCamera: recoilConfig.machinegunRecoilCamera,
+                            RecoilCategoryMultiplierHandRotation: recoilConfig.machinegunRecoilCategoryMultiplierHandRotation,
+                            RecoilStableAngleIncreaseStep: recoilConfig.machinegunRecoilStableAngleIncreaseStep
+                        },
+                        shotgun: {
+                            RecoilUp: recoilConfig.shotgunRecoilUp,
+                            RecoilBack: recoilConfig.shotgunRecoilBack,
+                            RecoilConvergence: recoilConfig.shotgunRecoilConvergence,
+                            Dispersion: recoilConfig.shotgunDispersion,
+                            RecoilHandDamping: recoilConfig.recoilHandDamping,
+                            RecoilCamera: recoilConfig.shotgunRecoilCamera,
+                            RecoilCategoryMultiplierHandRotation: recoilConfig.shotgunRecoilCategoryMultiplierHandRotation,
+                            RecoilStableAngleIncreaseStep: recoilConfig.shotgunRecoilStableAngleIncreaseStep
+                        }
+                    };
+
+                    if (recoilConfigMap[weapClass]) {
+                        const config = recoilConfigMap[weapClass];
                         logger2.logWithColor(`[Not So Realistic] Changing the recoil of ${weapons._name}`, LogTextColor.GREEN);
-                        weapons._props.RecoilForceUp *= (1 - config.smgRecoilUp);
-                        weapons._props.RecoilForceBack *= (1 - config.smgRecoilBack);
-                        weapons._props.RecoilReturnSpeedHandRotation *= (1 + config.smgRecoilConvergence);
-                        weapons._props.RecolDispersion *= (1 - config.smgDispersion);
-                        weapons._props.RecoilDampingHandRotation *= (1 - config.recoilHandDamping);
-                        weapons._props.RecoilCamera *= (1 - config.smgRecoilCamera);
-                        weapons._props.RecoilCategoryMultiplierHandRotation *= (1 - config.smgRecoilCategoryMultiplierHandRotation);
-                        weapons._props.RecoilStableAngleIncreaseStep *= (1 - config.smgRecoilStableAngleIncreaseStep);
-                    } 
-                    if(weapClass == "assaultRifle"){
-                        logger2.logWithColor(`[Not So Realistic] Changing the recoil of ${weapons._name}`, LogTextColor.GREEN);
-                        weapons._props.RecoilForceUp *= (1 - config.assaultRifleRecoilUp);
-                        weapons._props.RecoilForceBack *= (1 - config.assaultRifleRecoilBack);
-                        weapons._props.RecoilReturnSpeedHandRotation *= (1 + config.assaultRifleRecoilConvergence);
-                        weapons._props.RecolDispersion *= (1 - config.assaultRifleDispersion);
-                        weapons._props.RecoilDampingHandRotation *= (1 - config.recoilHandDamping);
-                        weapons._props.RecoilCamera *= (1 - config.assaultRifleRecoilCamera);
-                        weapons._props.RecoilCategoryMultiplierHandRotation *= (1 - config.assaultRifleRecoilCategoryMultiplierHandRotation);
-                        weapons._props.RecoilStableAngleIncreaseStep *= (1 - config.assaultRifleRecoilStableAngleIncreaseStep);
-                    }
-                    if(weapClass == "sniperRifle"){
-                        logger2.logWithColor(`[Not So Realistic] Changing the recoil of ${weapons._name}`, LogTextColor.GREEN);
-                        weapons._props.RecoilForceUp *= (1 - config.sniperRifleRecoilUp);
-                        weapons._props.RecoilForceBack *= (1 - config.sniperRifleRecoilBack);
-                        weapons._props.RecoilReturnSpeedHandRotation *= (1 + config.sniperRifleRecoilConvergence);
-                        weapons._props.RecolDispersion *= (1 - config.sniperRifleDispersion);
-                        weapons._props.RecoilDampingHandRotation *= (1 - config.recoilHandDamping);
-                        weapons._props.RecoilCamera *= (1 - config.sniperRifleRecoilCamera);
-                        weapons._props.RecoilCategoryMultiplierHandRotation *= (1 - config.sniperRifleRecoilCategoryMultiplierHandRotation);
-                        weapons._props.RecoilStableAngleIncreaseStep *= (1 - config.sniperRifleRecoilStableAngleIncreaseStep);
-                    }
-                    if(weapClass == "marksmanRifle"){
-                        logger2.logWithColor(`[Not So Realistic] Changing the recoil of ${weapons._name}`, LogTextColor.GREEN);
-                        weapons._props.RecoilForceUp *= (1 - config.marksmanRifleRecoilUp);
-                        weapons._props.RecoilForceBack *= (1 - config.marksmanRifleRecoilBack);
-                        weapons._props.RecoilReturnSpeedHandRotation *= (1 + config.marksmanRifleRecoilConvergence);
-                        weapons._props.RecolDispersion *= (1 - config.marksmanRifleDispersion);
-                        weapons._props.RecoilDampingHandRotation *= (1 - config.recoilHandDamping);
-                        weapons._props.RecoilCamera *= (1 - config.marksmanRifleRecoilCamera);
-                        weapons._props.RecoilCategoryMultiplierHandRotation *= (1 - config.marksmanRifleRecoilCategoryMultiplierHandRotation);
-                        weapons._props.RecoilStableAngleIncreaseStep *= (1 - config.marksmanRifleRecoilStableAngleIncreaseStep);
-                    }
-                    if(weapClass == "pistol"){
-                        logger2.logWithColor(`[Not So Realistic] Changing the recoil of ${weapons._name}`, LogTextColor.GREEN);
-                        weapons._props.RecoilForceUp *= (1 - config.pistolRecoilUp);
-                        weapons._props.RecoilForceBack *= (1 - config.pistolRecoilBack);
-                        weapons._props.RecoilReturnSpeedHandRotation *= (1 + config.pistolRecoilConvergence);
-                        weapons._props.RecolDispersion *= (1 - config.pistolDispersion);
-                        weapons._props.RecoilDampingHandRotation *= (1 - config.recoilHandDamping);
-                        weapons._props.RecoilCamera *= (1 - config.pistolRecoilCamera);
-                        weapons._props.RecoilCategoryMultiplierHandRotation *= (1 - config.pistolRecoilCategoryMultiplierHandRotation);
-                        weapons._props.RecoilStableAngleIncreaseStep *= (1 - config.pistolRecoilStableAngleIncreaseStep);
-                    }
-                    if(weapClass == "machinegun"){
-                        logger2.logWithColor(`[Not So Realistic] Changing the recoil of ${weapons._name}`, LogTextColor.GREEN);
-                        weapons._props.RecoilForceUp *= (1 - config.machinegunRecoilUp);
-                        weapons._props.RecoilForceBack *= (1 - config.machinegunRecoilBack);
-                        weapons._props.RecoilReturnSpeedHandRotation *= (1 + config.machinegunRecoilConvergence);
-                        weapons._props.RecolDispersion *= (1 - config.machinegunDispersion);
-                        weapons._props.RecoilDampingHandRotation *= (1 - config.recoilHandDamping);
-                        weapons._props.RecoilCamera *= (1 - config.machinegunRecoilCamera);
-                        weapons._props.RecoilCategoryMultiplierHandRotation *= (1 - config.machinegunRecoilCategoryMultiplierHandRotation);
-                        weapons._props.RecoilStableAngleIncreaseStep *= (1 - config.machinegunRecoilStableAngleIncreaseStep);
-                    }
-                    if(weapClass == "shotgun"){
-                        logger2.logWithColor(`[Not So Realistic] Changing the recoil of ${weapons._name}`, LogTextColor.GREEN);
-                        weapons._props.RecoilForceUp *= (1 - config.shotgunRecoilUp);
-                        weapons._props.RecoilForceBack *= (1 - config.shotgunRecoilBack);
-                        weapons._props.RecoilReturnSpeedHandRotation *= (1 + config.shotgunRecoilConvergence);
-                        weapons._props.RecolDispersion *= (1 - config.shotgunDispersion);
-                        weapons._props.RecoilDampingHandRotation *= (1 - config.recoilHandDamping);
-                        weapons._props.RecoilCamera *= (1 - config.shotgunRecoilCamera);
-                        weapons._props.RecoilCategoryMultiplierHandRotation *= (1 - config.shotgunRecoilCategoryMultiplierHandRotation);
-                        weapons._props.RecoilStableAngleIncreaseStep *= (1 - config.shotgunRecoilStableAngleIncreaseStep);
+                        weapons._props.RecoilForceUp *= (1 - config.RecoilUp);
+                        weapons._props.RecoilForceBack *= (1 - config.RecoilBack);
+                        weapons._props.RecoilReturnSpeedHandRotation *= (1 + config.RecoilConvergence);
+                        weapons._props.RecolDispersion *= (1 - config.Dispersion);
+                        weapons._props.RecoilDampingHandRotation *= (1 - config.RecoilHandDamping);
+                        weapons._props.RecoilCamera *= (1 - config.RecoilCamera);
+                        weapons._props.RecoilCategoryMultiplierHandRotation *= (1 - config.RecoilCategoryMultiplierHandRotation);
+                        weapons._props.RecoilStableAngleIncreaseStep *= (1 - config.RecoilStableAngleIncreaseStep);
+                    } else {
+                        logger2.logWithColor(`[Not So Realistic] ${weapons._name} is a ${weapClass}. Ignoring...`, LogTextColor.RED); 
                     }
                 }
             }
