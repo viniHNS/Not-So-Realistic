@@ -12,6 +12,7 @@ import { IDHelper } from "./IDHelper";
 import medsConfig from "../config/medsConfig.json";
 import recoilConfig from "../config/recoilConfig.json";
 import paracetamol from "../db/buffs/paracetamol.json";
+import exodrine from "../db/buffs/exodrine.json";
 
 class Mod implements IPostDBLoadMod, IPreSptLoadMod
 {
@@ -267,7 +268,7 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
 
         logger2.logWithColor("[Not So Realistic] All meds changes have been applied successfully!", LogTextColor.GREEN);
 
-        logger2.logWithColor("================================================================================================", LogTextColor.GREEN);
+        logger2.logWithColor("========================================================================================", LogTextColor.GREEN);
         // -------------------------------------------------------------------------------------
 
         //Changes in the individual weapon stats ------------------------------------------------
@@ -309,6 +310,16 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
                             RecoilCamera: recoilConfig.assaultRifleRecoilCamera,
                             RecoilCategoryMultiplierHandRotation: recoilConfig.assaultRifleRecoilCategoryMultiplierHandRotation,
                             RecoilStableAngleIncreaseStep: recoilConfig.assaultRifleRecoilStableAngleIncreaseStep
+                        },
+                        assaultCarbine: {
+                            RecoilUp: recoilConfig.assaultCarbineRecoilUp,
+                            RecoilBack: recoilConfig.assaultCarbineRecoilBack,
+                            RecoilConvergence: recoilConfig.assaultCarbineRecoilConvergence,
+                            Dispersion: recoilConfig.assaultCarbineDispersion,
+                            RecoilHandDamping: recoilConfig.recoilHandDamping,
+                            RecoilCamera: recoilConfig.assaultCarbineRecoilCamera,
+                            RecoilCategoryMultiplierHandRotation: recoilConfig.assaultCarbineRecoilCategoryMultiplierHandRotation,
+                            RecoilStableAngleIncreaseStep: recoilConfig.assaultCarbineRecoilStableAngleIncreaseStep
                         },
                         sniperRifle: {
                             RecoilUp: recoilConfig.sniperRifleRecoilUp,
@@ -374,12 +385,14 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
                         weapons._props.RecoilCategoryMultiplierHandRotation *= (1 - config.RecoilCategoryMultiplierHandRotation);
                         weapons._props.RecoilStableAngleIncreaseStep *= (1 - config.RecoilStableAngleIncreaseStep);
                     } else {
-                        logger2.logWithColor(`[Not So Realistic] ${weapons._name} is a ${weapClass}. Ignoring...`, LogTextColor.RED); 
+                        logger2.logWithColor(`[Not So Realistic] ${weapons._name} is a ${weapClass}. Ignoring...`, LogTextColor.YELLOW); 
                     }
                 }
             }
         }
         logger2.logWithColor("[Not So Realistic] All weapon recoil changes have been applied successfully!", LogTextColor.GREEN);
+
+        logger2.logWithColor("========================================================================================", LogTextColor.GREEN);
         
         // Thanks TRON <3
         const logger = container.resolve<ILogger>("WinstonLogger");
@@ -400,8 +413,10 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
         const buffs = db.globals.config.Health.Effects.Stimulator.Buffs
 
         //ID buff paracetamol -> 67150653e2809bdac7054f97
+        //ID buff exodrine    -> 67352799ac0f173f618601ff
 
         buffs["67150653e2809bdac7054f97"] = paracetamol;
+        buffs["67352799ac0f173f618601ff"] = exodrine;
 
 
         for(const itemFile in mydb.templates.items) {
