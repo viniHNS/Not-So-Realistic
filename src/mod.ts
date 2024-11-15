@@ -34,23 +34,54 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
         const tables = databaseServer.getTables();
         
         // Meds Changes --------------------------------------------------------------------
-        const carKitHP = config.carKitHP;
-        const salewaHP = config.salewaHP;
-        const ifakHP = config.ifakHP;
-        const afakHP = config.afakHP;
-        const grizzlyHP = config.grizzlyHP;
-        const ai2HP = config.ai2HP;
+        function setEffectDamage(item: any, effect: string, configKey: string, config: any): void {
+            if (config[configKey]) {
+                item._props.effects_damage[effect] = {
+                    delay: 0,
+                    duration: 0,
+                    fadeOut: 0,
+                    cost: config[configKey]
+                };
+            }
+        }
+    
+        function setSurgeryEffect(item: any, configKey: string, config: any): void {
+            if (config[configKey]) {
+                item._props.effects_damage["DestroyedPart"] = {
+                    delay: 0,
+                    duration: 0,
+                    fadeOut: 0,
+                    healthPenaltyMin: 60,
+                    healthPenaltyMax: 72,
+                    cost: config[configKey]
+                };
+            }
+        }
+    
+        function applyChanges(item: any, config: any, prefix: string): void {
+            setEffectDamage(item, "Fracture", `${prefix}FractureHealCost`, config);
+            setSurgeryEffect(item, `${prefix}SurgeryCost`, config);
+            setEffectDamage(item, "HeavyBleeding", `${prefix}HeavyBleedingHealCost`, config);
+            setEffectDamage(item, "LightBleeding", `${prefix}LightBleedingHealCost`, config);
+        }
 
-        const calocUsage = config.calocUsage;
-        const armyBandageUsage = config.armyBandageUsage;
-        const analginPainkillersUsage = config.analginPainkillersUsage;
-        const augmentinUsage = config.augmentinUsage;
-        const ibuprofenUsage = config.ibuprofenUsage;
-        const vaselinUsage = config.vaselinUsage;
-        const goldenStarUsage = config.goldenStarUsage;
-        const aluminiumSplintUsage = config.aluminiumSplintUsage;
-        const cmsUsage = config.cmsUsage;
-        const survivalKitUsage = config.survivalKitUsage;
+        const carKitHP: number = config.carKitHP;
+        const salewaHP: number = config.salewaHP;
+        const ifakHP: number = config.ifakHP;
+        const afakHP: number = config.afakHP;
+        const grizzlyHP: number = config.grizzlyHP;
+        const ai2HP: number = config.ai2HP;
+    
+        const calocUsage: number = config.calocUsage;
+        const armyBandageUsage: number = config.armyBandageUsage;
+        const analginPainkillersUsage: number = config.analginPainkillersUsage;
+        const augmentinUsage: number = config.augmentinUsage;
+        const ibuprofenUsage: number = config.ibuprofenUsage;
+        const vaselinUsage: number = config.vaselinUsage;
+        const goldenStarUsage: number = config.goldenStarUsage;
+        const aluminiumSplintUsage: number = config.aluminiumSplintUsage;
+        const cmsUsage: number = config.cmsUsage;
+        const survivalKitUsage: number = config.survivalKitUsage;
 
 
         // Find the meds item by its Id (thanks NoNeedName)
@@ -75,23 +106,151 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
         const cms = tables.templates.items[idHelper.CMS];
 
         
+        // Changes --------------------------------------------------------------------
         
-        carKit._props.MaxHpResource = carKitHP;
-        salewa._props.MaxHpResource = salewaHP;
-        ifak._props.MaxHpResource = ifakHP;
-        afak._props.MaxHpResource = afakHP;
-        grizzly._props.MaxHpResource = grizzlyHP;
-        if(config.GrizzlyCanDoSurgery){
-            grizzly._props.effects_damage["DestroyedPart"] = {
-                "delay": 0,
-                "duration": 0,
-                "fadeOut": 0,
-                "healthPenaltyMin": 60,
-                "healthPenaltyMax": 72,
-                "cost": config.GrizzlySurgeryCost,
+        if (config.grizzlyChanges) {
+            applyChanges(grizzly, config, "Grizzly");
+            grizzly._props.MaxHpResource = grizzlyHP;
+            logger2.logWithColor(`[Making Meds Great Again!] Changing Grizzly`, LogTextColor.GREEN);
+        } else {
+            grizzly._props.effects_damage["LightBleeding"] = {
+                delay: 0,
+                duration: 0,
+                fadeOut: 0,
+                cost: 40
+            },
+            grizzly._props.effects_damage["HeavyBleeding"] = {
+                delay: 0,
+                duration: 0,
+                fadeOut: 0,
+                cost: 130
+            },
+            grizzly._props.effects_damage["Fracture"] = {
+                delay: 0,
+                duration: 0,
+                fadeOut: 0,
+                cost: 50
+            },
+            grizzly._props.effects_damage["Contusion"] = {
+                delay: 0,
+                duration: 0,
+                fadeOut: 0,
+                cost: 0
+            },
+            grizzly._props.effects_damage["RadExposure"] = {
+                delay: 0,
+                duration: 0,
+                fadeOut: 0,
+                cost: 0
             }
+            grizzly._props.MaxHpResource = 1800;
+            logger2.logWithColor(`[Making Meds Great Again!] Grizzly set to default`, LogTextColor.GREEN);
         }
-        ai2._props.MaxHpResource = ai2HP;
+        
+        if (config.ai2Changes) {
+            applyChanges(ai2, config, "ai2");
+            ai2._props.MaxHpResource = ai2HP;
+            logger2.logWithColor(`[Making Meds Great Again!] Changing AI-2`, LogTextColor.GREEN);
+        } else {
+            ai2._props.effects_damage["RadExposure"] = {
+                delay: 0,
+                duration: 0,
+                fadeOut: 0,
+                cost: 0
+            }
+            ai2._props.MaxHpResource = 100;
+            logger2.logWithColor(`[Making Meds Great Again!] AI-2 set to default`, LogTextColor.GREEN);
+        }
+        
+        if (config.carKitChanges) {
+            applyChanges(carKit, config, "carKit");
+            carKit._props.MaxHpResource = carKitHP;
+            logger2.logWithColor(`[Making Meds Great Again!] Changing Car First Aid Kit`, LogTextColor.GREEN);
+        } else {
+            carKit._props.effects_damage["LightBleeding"] = {
+                delay: 0,
+                duration: 0,
+                fadeOut: 0,
+                cost: 50
+            }
+            carKit._props.MaxHpResource = 220;
+            logger2.logWithColor(`[Making Meds Great Again!] Car First Aid Kit set to default`, LogTextColor.GREEN);
+        }
+        
+        if (config.salewaChanges) {
+            applyChanges(salewa, config, "salewa");
+            salewa._props.MaxHpResource = salewaHP;
+            logger2.logWithColor(`[Making Meds Great Again!] Changing Salewa`, LogTextColor.GREEN);
+        } else {
+            salewa._props.effects_damage["LightBleeding"] = {
+                delay: 0,
+                duration: 0,
+                fadeOut: 0,
+                cost: 45
+            },
+            salewa._props.effects_damage["HeavyBleeding"] = {
+                delay: 0,
+                duration: 0,
+                fadeOut: 0,
+                cost: 175
+            },
+            salewa._props.MaxHpResource = 400;
+            logger2.logWithColor(`[Making Meds Great Again!] Salewa set to default`, LogTextColor.GREEN);
+        }
+        
+        if (config.ifakChanges) {
+            applyChanges(ifak, config, "ifak");
+            ifak._props.MaxHpResource = ifakHP;
+            logger2.logWithColor(`[Making Meds Great Again!] Changing IFAK`, LogTextColor.GREEN);
+        } else {
+            ifak._props.effects_damage["LightBleeding"] = {
+                delay: 0,
+                duration: 0,
+                fadeOut: 0,
+                cost: 30
+            },
+            ifak._props.effects_damage["HeavyBleeding"] = {
+                delay: 0,
+                duration: 0,
+                fadeOut: 0,
+                cost: 210
+            },
+            ifak._props.effects_damage["RadExposure"] = {
+                delay: 0,
+                duration: 0,
+                fadeOut: 0,
+                cost: 0
+            }
+            ifak._props.MaxHpResource = 300;
+            logger2.logWithColor(`[Making Meds Great Again!] IFAK set to default`, LogTextColor.GREEN);
+        }
+        
+        if (config.afakChanges) {
+            applyChanges(afak, config, "afak");
+            afak._props.MaxHpResource = afakHP;
+            logger2.logWithColor(`[Making Meds Great Again!] Changing AFAK`, LogTextColor.GREEN);
+        } else {
+            afak._props.effects_damage["LightBleeding"] = {
+                delay: 0,
+                duration: 0,
+                fadeOut: 0,
+                cost: 30
+            },
+            afak._props.effects_damage["HeavyBleeding"] = {
+                delay: 0,
+                duration: 0,
+                fadeOut: 0,
+                cost: 170
+            },
+            afak._props.effects_damage["RadExposure"] = {
+                delay: 0,
+                duration: 0,
+                fadeOut: 0,
+                cost: 0
+            }
+            afak._props.MaxHpResource = 400;
+            logger2.logWithColor(`[Making Meds Great Again!] AFAK set to default`, LogTextColor.GREEN);
+        }
 
         calocB._props.MaxHpResource = calocUsage;
         armyBandages._props.MaxHpResource = armyBandageUsage;
