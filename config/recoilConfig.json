@@ -30,6 +30,15 @@
   "assaultRifleRecoilCategoryMultiplierHandRotation": 0.5,
   "assaultRifleRecoilStableAngleIncreaseStep": 0.12,
 
+  "assaultCarbineRecoilUp": 0.05,
+  "assaultCarbineRecoilBack": 0.1,
+  "assaultCarbineRecoilConvergence": 0.2,
+  "assaultCarbineDispersion": 0.2,
+  "assaultCarbineDampingHandRotation": 0.2,
+  "assaultCarbineRecoilCamera": 0.2,
+  "assaultCarbineRecoilCategoryMultiplierHandRotation": 0.4,
+  "assaultCarbineRecoilStableAngleIncreaseStep": 0.08,
+
   "machinegunRecoilUp": 0.04,
   "machinegunRecoilBack": 0.1,
   "machinegunRecoilConvergence": 0.2,
