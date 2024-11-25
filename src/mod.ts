@@ -34,38 +34,6 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
 
         // Get all the in-memory json found in /assets/database
         const tables = databaseServer.getTables();
-        
-        // Meds Changes --------------------------------------------------------------------
-        function setEffectDamage(item: any, effect: string, configKey: string, config: any): void {
-            if (config[configKey]) {
-                item._props.effects_damage[effect] = {
-                    delay: 0,
-                    duration: 0,
-                    fadeOut: 0,
-                    cost: config[configKey]
-                };
-            }
-        }
-    
-        function setSurgeryEffect(item: any, configKey: string, config: any): void {
-            if (config[configKey]) {
-                item._props.effects_damage["DestroyedPart"] = {
-                    delay: 0,
-                    duration: 0,
-                    fadeOut: 0,
-                    healthPenaltyMin: 60,
-                    healthPenaltyMax: 72,
-                    cost: config[configKey]
-                };
-            }
-        }
-    
-        function applyChanges(item: any, config: any, prefix: string): void {
-            setEffectDamage(item, "Fracture", `${prefix}FractureHealCost`, config);
-            setSurgeryEffect(item, `${prefix}SurgeryCost`, config);
-            setEffectDamage(item, "HeavyBleeding", `${prefix}HeavyBleedingHealCost`, config);
-            setEffectDamage(item, "LightBleeding", `${prefix}LightBleedingHealCost`, config);
-        }
 
         const carKitHP: number = medsConfig.carKitHP;
         const salewaHP: number = medsConfig.salewaHP;
@@ -107,7 +75,42 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
         const survivalKit = tables.templates.items[idHelper.SURVIVAL_KIT];
         const cms = tables.templates.items[idHelper.CMS];
 
+        const weaponsWithDoubleAction = [
+            
+        ]
         
+        // Meds Changes --------------------------------------------------------------------
+        function setEffectDamage(item: any, effect: string, configKey: string, config: any): void {
+            if (config[configKey]) {
+                item._props.effects_damage[effect] = {
+                    delay: 0,
+                    duration: 0,
+                    fadeOut: 0,
+                    cost: config[configKey]
+                };
+            }
+        }
+    
+        function setSurgeryEffect(item: any, configKey: string, config: any): void {
+            if (config[configKey]) {
+                item._props.effects_damage["DestroyedPart"] = {
+                    delay: 0,
+                    duration: 0,
+                    fadeOut: 0,
+                    healthPenaltyMin: 60,
+                    healthPenaltyMax: 72,
+                    cost: config[configKey]
+                };
+            }
+        }
+    
+        function applyChanges(item: any, config: any, prefix: string): void {
+            setEffectDamage(item, "Fracture", `${prefix}FractureHealCost`, config);
+            setSurgeryEffect(item, `${prefix}SurgeryCost`, config);
+            setEffectDamage(item, "HeavyBleeding", `${prefix}HeavyBleedingHealCost`, config);
+            setEffectDamage(item, "LightBleeding", `${prefix}LightBleedingHealCost`, config);
+        }
+
         // Changes --------------------------------------------------------------------
         
         if (medsConfig.grizzlyChanges) {
@@ -274,7 +277,7 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
         //Changes in the individual weapon stats ------------------------------------------------
         const kriss_9mm = tables.templates.items[idHelper.kriss_vector_9mm];
 
-        kriss_9mm._props.bFirerate = 1200;
+        kriss_9mm._props.bFirerate = 1100;
 
         // Changes in the Recoil of the weapons ------------------------------------------------
         tables.globals.config.Aiming.RecoilCrank = recoilConfig.recoilCrank;
