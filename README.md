@@ -9,13 +9,17 @@ This is a mod for [SPT](https://www.sp-tarkov.com "The main goal of the project 
 
 ## What does this mod do?
 
-It enhances existing medical kits.
+#### It enhances existing medical kits.
 
 - Each medical kit can be configured via the JSON file located in the config folder.
 
-Reduce the recoil of all weapons.
+#### Reduce the recoil of all weapons.
 
 - Each weapon category can be configured via the JSON file located in the config folder.
+
+#### Some QOL changes.
+
+- Removes the double-action penality.
 
 ## New Medication
 
