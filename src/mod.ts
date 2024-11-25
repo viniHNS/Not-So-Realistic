@@ -11,6 +11,7 @@ import path from "path";
 import { IDHelper } from "./IDHelper";
 import medsConfig from "../config/medsConfig.json";
 import recoilConfig from "../config/recoilConfig.json";
+import qolConfig from "../config/qolConfig.json";
 import paracetamol from "../db/buffs/paracetamol.json";
 import exodrine from "../db/buffs/exodrine.json";
 
@@ -75,10 +76,6 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
         const survivalKit = tables.templates.items[idHelper.SURVIVAL_KIT];
         const cms = tables.templates.items[idHelper.CMS];
 
-        const weaponsWithDoubleAction = [
-            
-        ]
-        
         // Meds Changes --------------------------------------------------------------------
         function setEffectDamage(item: any, effect: string, configKey: string, config: any): void {
             if (config[configKey]) {
@@ -275,7 +272,7 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
         // -------------------------------------------------------------------------------------
 
         //Changes in the individual weapon stats ------------------------------------------------
-        const kriss_9mm = tables.templates.items[idHelper.kriss_vector_9mm];
+        const kriss_9mm = tables.templates.items[idHelper.KRISS_VECTOR_9MM];
 
         kriss_9mm._props.bFirerate = 1100;
 
@@ -293,6 +290,12 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
                 if(weapClass == "" || weapClass == null || type == "Node"){
                     continue;
                 } else {
+
+                    if(weapons._props.weapFireType.includes("doubleaction") && qolConfig.enable){
+                        weapons._props.DoubleActionAccuracyPenalty = qolConfig.doubleActionAccuracyPenalty;
+                        logger2.logWithColor(`[Not So Realistic] Removing the Double Action Accuracy Penalty from ${weapons._name}`, LogTextColor.GREEN);
+                    }
+
                     const recoilConfigMap = {
                         smg: {
                             RecoilUp: recoilConfig.smgRecoilUp,
