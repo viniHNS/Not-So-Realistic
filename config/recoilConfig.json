@@ -1,6 +1,6 @@
 { 
   "recoilCrank": true,
-  "recoilDamping": 0.6,
+  "recoilDamping": 0.58,
   "recoilHandDamping": 0.4,
 
   "smgRecoilUp": 0.01,
@@ -66,8 +66,8 @@
   "marksmanRifleRecoilCategoryMultiplierHandRotation": 0.3,
   "marksmanRifleRecoilStableAngleIncreaseStep": 0.13,
   
-  "shotgunRecoilUp": 0.05,
-  "shotgunRecoilBack": 0.1,
+  "shotgunRecoilUp": 0.04,
+  "shotgunRecoilBack": 0.08,
   "shotgunRecoilConvergence": 0.25,
   "shotgunDispersion": 0.2,
   "shotgunDampingHandRotation": 0.14,
