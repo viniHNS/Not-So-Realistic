@@ -20,11 +20,15 @@ This is a mod for [SPT](https://www.sp-tarkov.com "The main goal of the project 
 #### Some QOL changes.
 
 - Removes the double-action penality.
+- Kriss Vector 9mm has the same rate of fire as the .45 ACP version.
 
-## New Medication
+## New Medications
 
 - Paracetamol  
 ###### Lowers the PMC's temperature for a short time and also relieves pain for a short period with a small delay.
+
+- Exodrine
+###### The Exodrine is designed to push human endurance to their absolute limits, providing extraordinary boosts in physical strength, making it invaluable in high-stakes combat scenarios. However, its potent effects come at a severe cost, with unpredictable side effects that can leave the user debilitated after the stimulant wears off.
 
 ## Installation
 
