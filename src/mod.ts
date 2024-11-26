@@ -293,7 +293,7 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
 
                     if(weapons._props.weapFireType.includes("doubleaction") && qolConfig.enable){
                         weapons._props.DoubleActionAccuracyPenalty = qolConfig.doubleActionAccuracyPenalty;
-                        logger2.logWithColor(`[Not So Realistic] Removing the Double Action Accuracy Penalty from ${weapons._name}`, LogTextColor.GREEN);
+                        logger2.logWithColor(`[Not So Realistic] Changing the Double Action Accuracy Penalty from ${weapons._name} to ${qolConfig.doubleActionAccuracyPenalty}`, LogTextColor.GREEN);
                     }
 
                     const recoilConfigMap = {
