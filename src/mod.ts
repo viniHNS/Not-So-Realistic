@@ -88,6 +88,12 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
             }
         }
     
+        function removeEffect(item: any, effect: string): void {
+            //Remove the effect from array like this one item._props.effects_damage["DestroyedPart"] 
+            delete item._props.effects_damage[effect]
+
+        }
+    
         function setSurgeryEffect(item: any, configKey: string, config: any): void {
             if (config[configKey]) {
                 item._props.effects_damage["DestroyedPart"] = {
@@ -102,10 +108,26 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
         }
     
         function applyChanges(item: any, config: any, prefix: string): void {
-            setEffectDamage(item, "Fracture", `${prefix}FractureHealCost`, config);
-            setSurgeryEffect(item, `${prefix}SurgeryCost`, config);
-            setEffectDamage(item, "HeavyBleeding", `${prefix}HeavyBleedingHealCost`, config);
-            setEffectDamage(item, "LightBleeding", `${prefix}LightBleedingHealCost`, config);
+
+            const effects = [
+                { effect: "Fracture", canHeal: `${prefix}CanHealFractures`, costKey: `${prefix}FractureHealCost` },
+                { effect: "DestroyedPart", canHeal: `${prefix}CanDoSurgery`, costKey: `${prefix}SurgeryCost`, isSurgery: true },
+                { effect: "HeavyBleeding", canHeal: `${prefix}CanHealHeavyBleeding`, costKey: `${prefix}HeavyBleedingHealCost` },
+                { effect: "LightBleeding", canHeal: `${prefix}CanHealLightBleeding`, costKey: `${prefix}LightBleedingHealCost` },
+            ];
+
+            effects.forEach(({ effect, canHeal, costKey, isSurgery }) => {
+                if (config[canHeal]) {
+                    if (isSurgery) {
+                        setSurgeryEffect(item, costKey, config);
+                    } else {
+                        setEffectDamage(item, effect, costKey, config);
+                    }
+                } else {
+                    removeEffect(item, effect);
+                }
+            });
+            
         }
 
         // Changes --------------------------------------------------------------------
