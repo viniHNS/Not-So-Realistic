@@ -4,10 +4,10 @@
     "main": "src/mod.js",
     "license": "MIT",
     "author": "viniHNS",
-    "sptVersion": "~3.9",
+    "sptVersion": "~3.10",
 	"loadBefore": [],
 	"loadAfter": [],
-	"incompatibilities": [],
+	"incompatibilities": ["vinihns-makemedsgreatagain"],
 	"contributors": [],
 	"isBundleMod": false,
     "scripts": {
