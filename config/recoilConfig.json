@@ -9,7 +9,7 @@
   "smgDispersion": 0.15,
   "smgDampingHandRotation": 0.2,
   "smgRecoilCamera": 0.1,
-  "smgRecoilCategoryMultiplierHandRotation": 0.3,
+  "smgRecoilCategoryMultiplierHandRotation": 0.02,
   "smgRecoilStableAngleIncreaseStep": 0.1,
 
   "pistolRecoilUp": 0.01,
@@ -27,7 +27,7 @@
   "assaultRifleDispersion": 0.28,
   "assaultRifleDampingHandRotation": 0.23,
   "assaultRifleRecoilCamera": 0.1,
-  "assaultRifleRecoilCategoryMultiplierHandRotation": 0.3,
+  "assaultRifleRecoilCategoryMultiplierHandRotation": 0.15,
   "assaultRifleRecoilStableAngleIncreaseStep": 0.10,
 
   "assaultCarbineRecoilUp": 0.03,
@@ -36,7 +36,7 @@
   "assaultCarbineDispersion": 0.2,
   "assaultCarbineDampingHandRotation": 0.2,
   "assaultCarbineRecoilCamera": 0.2,
-  "assaultCarbineRecoilCategoryMultiplierHandRotation": 0.3,
+  "assaultCarbineRecoilCategoryMultiplierHandRotation": 0.1,
   "assaultCarbineRecoilStableAngleIncreaseStep": 0.08,
 
   "machinegunRecoilUp": 0.01,
@@ -45,7 +45,7 @@
   "machinegunDispersion": 0.28,
   "machinegunDampingHandRotation": 0.23,
   "machinegunRecoilCamera": 0.1,
-  "machinegunRecoilCategoryMultiplierHandRotation": 0.3,
+  "machinegunRecoilCategoryMultiplierHandRotation": 0.2,
   "machinegunRecoilStableAngleIncreaseStep": 0.12,
   
   "sniperRifleRecoilUp": 0.05,
@@ -54,7 +54,7 @@
   "sniperRifleDispersion": 0.14,
   "sniperRifleDampingHandRotation": 0.14,
   "sniperRifleRecoilCamera": 0.14,
-  "sniperRifleRecoilCategoryMultiplierHandRotation": 0.2,
+  "sniperRifleRecoilCategoryMultiplierHandRotation": 0.05,
   "sniperRifleRecoilStableAngleIncreaseStep": 0.14,
 
   "marksmanRifleRecoilUp": 0.01,
@@ -63,15 +63,15 @@
   "marksmanRifleDispersion": 0.2,
   "marksmanRifleDampingHandRotation": 0.01,
   "marksmanRifleRecoilCamera": 0.13,
-  "marksmanRifleRecoilCategoryMultiplierHandRotation": 0.18,
+  "marksmanRifleRecoilCategoryMultiplierHandRotation": 0.05,
   "marksmanRifleRecoilStableAngleIncreaseStep": 0.13,
   
   "shotgunRecoilUp": 0.01,
   "shotgunRecoilBack": 0.04,
-  "shotgunRecoilConvergence": 0.2,
+  "shotgunRecoilConvergence": 0.25,
   "shotgunDispersion": 0.2,
-  "shotgunDampingHandRotation": 0.18,
+  "shotgunDampingHandRotation": 0.3,
   "shotgunRecoilCamera": 0.10,
-  "shotgunRecoilCategoryMultiplierHandRotation": 0.2,
+  "shotgunRecoilCategoryMultiplierHandRotation": 0.3,
   "shotgunRecoilStableAngleIncreaseStep": 0.10
 }
