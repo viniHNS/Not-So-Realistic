@@ -423,6 +423,15 @@ export class IDHelper
     //Shotguns
     public MTS_255_12GA = "60db29ce99594040e04c4a27";
 
+    //LMG
+    public RPD = "6513ef33e06849f06c0957ca";
+    public RPDN = "65268d8ecb944ff1e90ea385";
+
+    //Supressors
+    public ALPHA_DOG_ALPHA_SUPRESSOR_9MM = "5a33a8ebc4a282000c5a950d";
+
+
+
     /*
     PROVISONS = "5448e8d04bdc2ddf718b4569";
     WATER = "5448e8d64bdc2dce718b4568";
