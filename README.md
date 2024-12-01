@@ -1,6 +1,6 @@
 # Not so Realistic! - Server
 
-#### [Client side / Plugin]()
+#### [Client side / Plugin](https://github.com/viniHNS/notSoRealistic-Plugin)
 #### [EN](README.md) | [PT_BR](README_BR.md)
 
 ## What is this?
