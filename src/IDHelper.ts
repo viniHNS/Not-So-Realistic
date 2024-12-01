@@ -430,6 +430,9 @@ export class IDHelper
     //Supressors
     public ALPHA_DOG_ALPHA_SUPRESSOR_9MM = "5a33a8ebc4a282000c5a950d";
 
+    //Barrels
+    public RPD_520mm = "6513eff1e06849f06c0957d4";
+    public RPD_SAWED_OFF_350mm = "65266fd43341ed9aa903dd56";
 
 
     /*
