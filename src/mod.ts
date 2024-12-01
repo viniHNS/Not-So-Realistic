@@ -386,8 +386,8 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
         ]
         alpha_dog_supressor_9mm._props.Slots[0]._props.filters[0].Filter.push(...scopesToAdd);
 
-        const RPD = tables.templates.items[idHelper.RPD];
-        const RPDN = tables.templates.items[idHelper.RPDN];
+        const RPD_520mm = tables.templates.items[idHelper.RPD_520mm];
+        const RPD_sawed_off_350mm = tables.templates.items[idHelper.RPD_SAWED_OFF_350mm];
 
         const muzzlesToAdd = [
             "59d64fc686f774171b243fe2",
@@ -408,8 +408,9 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
             "64942bfc6ee699f6890dff95"
               
         ]
-        RPD._props.Slots[2]._props.filters[0].Filter.push(...muzzlesToAdd);
-        RPDN._props.Slots[2]._props.filters[0].Filter.push(...muzzlesToAdd);
+
+        RPD_520mm._props.Slots[1]._props.filters[0].Filter.push(...muzzlesToAdd);
+        RPD_sawed_off_350mm._props.Slots[0]._props.filters[0].Filter.push(...muzzlesToAdd);
 
         //#endregion
 
