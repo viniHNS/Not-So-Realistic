@@ -17,12 +17,12 @@
 
   "pistolRecoilUp": 0.01,
   "pistolRecoilBack": 0.1,
-  "pistolRecoilConvergence": 0.08,
-  "pistolDispersion": 0.08,
-  "pistolDampingHandRotation": 0.04,
+  "pistolRecoilConvergence": 0.01,
+  "pistolDispersion": 0.01,
+  "pistolDampingHandRotation": 0.01,
   "pistolRecoilCamera": 0.08,
   "pistolRecoilCategoryMultiplierHandRotation": 0.01,
-  "pistolRecoilStableAngleIncreaseStep": 0.08,
+  "pistolRecoilStableAngleIncreaseStep": 0.01,
   
   "assaultRifleRecoilUp": 0.01,
   "assaultRifleRecoilBack": 0.1,
