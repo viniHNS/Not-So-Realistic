@@ -1,6 +1,9 @@
 { 
+
+  "changes": true,
+
   "recoilCrank": true,
-  "recoilDamping": 0.58,
+  "recoilDamping": 0.50,
   "recoilHandDamping": 0.4,
 
   "smgRecoilUp": 0.01,
