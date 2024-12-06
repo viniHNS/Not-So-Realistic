@@ -5,11 +5,13 @@
     "license": "MIT",
     "author": "viniHNS",
     "sptVersion": "~3.10",
-	"loadBefore": [],
-	"loadAfter": [],
-	"incompatibilities": ["vinihns-makemedsgreatagain"],
-	"contributors": [],
-	"isBundleMod": false,
+    "loadBefore": [],
+    "loadAfter": [],
+    "incompatibilities": [
+        "vinihns-makemedsgreatagain"
+    ],
+    "contributors": [],
+    "isBundleMod": false,
     "scripts": {
         "setup": "npm i",
         "build": "node ./build.mjs",
