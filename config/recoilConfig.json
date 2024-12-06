@@ -69,12 +69,12 @@
   "marksmanRifleRecoilCategoryMultiplierHandRotation": 0.05,
   "marksmanRifleRecoilStableAngleIncreaseStep": 0.13,
   
-  "shotgunRecoilUp": 0.01,
-  "shotgunRecoilBack": 0.04,
-  "shotgunRecoilConvergence": 0.25,
-  "shotgunDispersion": 0.2,
-  "shotgunDampingHandRotation": 0.3,
+  "shotgunRecoilUp": 0.02,
+  "shotgunRecoilBack": 0.05,
+  "shotgunRecoilConvergence": 0.33,
+  "shotgunDispersion": 0.33,
+  "shotgunDampingHandRotation": 0.38,
   "shotgunRecoilCamera": 0.10,
-  "shotgunRecoilCategoryMultiplierHandRotation": 0.3,
-  "shotgunRecoilStableAngleIncreaseStep": 0.10
+  "shotgunRecoilCategoryMultiplierHandRotation": 0.36,
+  "shotgunRecoilStableAngleIncreaseStep": 0.12
 }
