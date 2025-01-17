@@ -162,177 +162,179 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
 
 
         //#region Meds Changes
-        
-        if (medsConfig.grizzlyChanges) {
-            applyChanges(grizzly, medsConfig, "Grizzly");
-            grizzly._props.MaxHpResource = grizzlyHP;
-            log("[Not So Realistic] Changing Grizzly", miscConfig.enableLogs, LogTextColor.GREEN);
-            
-            
-        } else {
-            grizzly._props.effects_damage["LightBleeding"] = {
-                delay: 0,
-                duration: 0,
-                fadeOut: 0,
-                cost: 40
-            },
-            grizzly._props.effects_damage["HeavyBleeding"] = {
-                delay: 0,
-                duration: 0,
-                fadeOut: 0,
-                cost: 130
-            },
-            grizzly._props.effects_damage["Fracture"] = {
-                delay: 0,
-                duration: 0,
-                fadeOut: 0,
-                cost: 50
-            },
-            grizzly._props.effects_damage["Contusion"] = {
-                delay: 0,
-                duration: 0,
-                fadeOut: 0,
-                cost: 0
-            },
-            grizzly._props.effects_damage["RadExposure"] = {
-                delay: 0,
-                duration: 0,
-                fadeOut: 0,
-                cost: 0
-            }
-            grizzly._props.MaxHpResource = 1800;
-            log("[Not So Realistic] Grizzly set to default", miscConfig.enableLogs, LogTextColor.GREEN
-            
-        }
-        
-        if (medsConfig.ai2Changes) {
-            applyChanges(ai2, medsConfig, "ai2");
-            ai2._props.MaxHpResource = ai2HP;
-            log("[Not So Realistic] Changing AI-2", miscConfig.enableLogs, LogTextColor.GREEN);
-        } else {
-            ai2._props.effects_damage["RadExposure"] = {
-                delay: 0,
-                duration: 0,
-                fadeOut: 0,
-                cost: 0
-            }
-            ai2._props.MaxHpResource = 100;
-            log("[Not So Realistic] AI-2 set to default", miscConfig.enableLogs, LogTextColor.GREEN);
-            
-        }
-        
-        if (medsConfig.carKitChanges) {
-            applyChanges(carKit, medsConfig, "carKit");
-            carKit._props.MaxHpResource = carKitHP;
-            log("[Not So Realistic] Changing Car First Aid Kit", miscConfig.enableLogs, LogTextColor.GREEN);
-            
-        } else {
-            carKit._props.effects_damage["LightBleeding"] = {
-                delay: 0,
-                duration: 0,
-                fadeOut: 0,
-                cost: 50
-            }
-            carKit._props.MaxHpResource = 220;
-            log("[Not So Realistic] Car First Aid Kit set to default", miscConfig.enableLogs, LogTextColor.GREEN);
-            
-        }
-        
-        if (medsConfig.salewaChanges) {
-            applyChanges(salewa, medsConfig, "salewa");
-            salewa._props.MaxHpResource = salewaHP;
-            log("[Not So Realistic] Changing Salewa", miscConfig.enableLogs, LogTextColor.GREEN);
-            
-        } else {
-            salewa._props.effects_damage["LightBleeding"] = {
-                delay: 0,
-                duration: 0,
-                fadeOut: 0,
-                cost: 45
-            },
-            salewa._props.effects_damage["HeavyBleeding"] = {
-                delay: 0,
-                duration: 0,
-                fadeOut: 0,
-                cost: 175
-            },
-            salewa._props.MaxHpResource = 400;
-            log("[Not So Realistic] Salewa set to default", miscConfig.enableLogs, LogTextColor.GREEN);
-            
-        }
-        
-        if (medsConfig.ifakChanges) {
-            applyChanges(ifak, medsConfig, "ifak");
-            ifak._props.MaxHpResource = ifakHP;
-            log("[Not So Realistic] Changing IFAK", miscConfig.enableLogs, LogTextColor.GREEN);
-            
-        } else {
-            ifak._props.effects_damage["LightBleeding"] = {
-                delay: 0,
-                duration: 0,
-                fadeOut: 0,
-                cost: 30
-            },
-            ifak._props.effects_damage["HeavyBleeding"] = {
-                delay: 0,
-                duration: 0,
-                fadeOut: 0,
-                cost: 210
-            },
-            ifak._props.effects_damage["RadExposure"] = {
-                delay: 0,
-                duration: 0,
-                fadeOut: 0,
-                cost: 0
-            }
-            ifak._props.MaxHpResource = 300;
-            log("[Not So Realistic] IFAK set to default", miscConfig.enableLogs, LogTextColor.GREEN);
-            
-        }
-        
-        if (medsConfig.afakChanges) {
-            applyChanges(afak, medsConfig, "afak");
-            afak._props.MaxHpResource = afakHP;
-            log("[Not So Realistic] Changing AFAK", miscConfig.enableLogs, LogTextColor.GREEN);
-            
-        } else {
-            afak._props.effects_damage["LightBleeding"] = {
-                delay: 0,
-                duration: 0,
-                fadeOut: 0,
-                cost: 30
-            },
-            afak._props.effects_damage["HeavyBleeding"] = {
-                delay: 0,
-                duration: 0,
-                fadeOut: 0,
-                cost: 170
-            },
-            afak._props.effects_damage["RadExposure"] = {
-                delay: 0,
-                duration: 0,
-                fadeOut: 0,
-                cost: 0
-            }
-            afak._props.MaxHpResource = 400;
-            log("[Not So Realistic] AFAK set to default", miscConfig.enableLogs, LogTextColor.GREEN);
-            
-        }
+        if(medsConfig.enable){
 
-        calocB._props.MaxHpResource = calocUsage;
-        armyBandages._props.MaxHpResource = armyBandageUsage;
-        analginPainkillers._props.MaxHpResource = analginPainkillersUsage;
-        augmentin._props.MaxHpResource = augmentinUsage;
-        ibuprofen._props.MaxHpResource = ibuprofenUsage;
+        
+            if (medsConfig.grizzlyChanges) {
+                applyChanges(grizzly, medsConfig, "Grizzly");
+                grizzly._props.MaxHpResource = grizzlyHP;
+                log("[Not So Realistic] Changing Grizzly", miscConfig.enableLogs, LogTextColor.GREEN);
+                
+            } else {
+                grizzly._props.effects_damage["LightBleeding"] = {
+                    delay: 0,
+                    duration: 0,
+                    fadeOut: 0,
+                    cost: 40
+                },
+                grizzly._props.effects_damage["HeavyBleeding"] = {
+                    delay: 0,
+                    duration: 0,
+                    fadeOut: 0,
+                    cost: 130
+                },
+                grizzly._props.effects_damage["Fracture"] = {
+                    delay: 0,
+                    duration: 0,
+                    fadeOut: 0,
+                    cost: 50
+                },
+                grizzly._props.effects_damage["Contusion"] = {
+                    delay: 0,
+                    duration: 0,
+                    fadeOut: 0,
+                    cost: 0
+                },
+                grizzly._props.effects_damage["RadExposure"] = {
+                    delay: 0,
+                    duration: 0,
+                    fadeOut: 0,
+                    cost: 0
+                }
+                grizzly._props.MaxHpResource = 1800;
+                log("[Not So Realistic] Grizzly set to default", miscConfig.enableLogs, LogTextColor.GREEN);
+            }
+            
+            if (medsConfig.ai2Changes) {
+                applyChanges(ai2, medsConfig, "ai2");
+                ai2._props.MaxHpResource = ai2HP;
+                log("[Not So Realistic] Changing AI-2", miscConfig.enableLogs, LogTextColor.GREEN);
+            } else {
+                ai2._props.effects_damage["RadExposure"] = {
+                    delay: 0,
+                    duration: 0,
+                    fadeOut: 0,
+                    cost: 0
+                }
+                ai2._props.MaxHpResource = 100;
+                log("[Not So Realistic] AI-2 set to default", miscConfig.enableLogs, LogTextColor.GREEN);
+                
+            }
+            
+            if (medsConfig.carKitChanges) {
+                applyChanges(carKit, medsConfig, "carKit");
+                carKit._props.MaxHpResource = carKitHP;
+                log("[Not So Realistic] Changing Car First Aid Kit", miscConfig.enableLogs, LogTextColor.GREEN);
+                
+            } else {
+                carKit._props.effects_damage["LightBleeding"] = {
+                    delay: 0,
+                    duration: 0,
+                    fadeOut: 0,
+                    cost: 50
+                }
+                carKit._props.MaxHpResource = 220;
+                log("[Not So Realistic] Car First Aid Kit set to default", miscConfig.enableLogs, LogTextColor.GREEN);
+                
+            }
+            
+            if (medsConfig.salewaChanges) {
+                applyChanges(salewa, medsConfig, "salewa");
+                salewa._props.MaxHpResource = salewaHP;
+                log("[Not So Realistic] Changing Salewa", miscConfig.enableLogs, LogTextColor.GREEN);
+                
+            } else {
+                salewa._props.effects_damage["LightBleeding"] = {
+                    delay: 0,
+                    duration: 0,
+                    fadeOut: 0,
+                    cost: 45
+                },
+                salewa._props.effects_damage["HeavyBleeding"] = {
+                    delay: 0,
+                    duration: 0,
+                    fadeOut: 0,
+                    cost: 175
+                },
+                salewa._props.MaxHpResource = 400;
+                log("[Not So Realistic] Salewa set to default", miscConfig.enableLogs, LogTextColor.GREEN);
+                
+            }
+            
+            if (medsConfig.ifakChanges) {
+                applyChanges(ifak, medsConfig, "ifak");
+                ifak._props.MaxHpResource = ifakHP;
+                log("[Not So Realistic] Changing IFAK", miscConfig.enableLogs, LogTextColor.GREEN);
+                
+            } else {
+                ifak._props.effects_damage["LightBleeding"] = {
+                    delay: 0,
+                    duration: 0,
+                    fadeOut: 0,
+                    cost: 30
+                },
+                ifak._props.effects_damage["HeavyBleeding"] = {
+                    delay: 0,
+                    duration: 0,
+                    fadeOut: 0,
+                    cost: 210
+                },
+                ifak._props.effects_damage["RadExposure"] = {
+                    delay: 0,
+                    duration: 0,
+                    fadeOut: 0,
+                    cost: 0
+                }
+                ifak._props.MaxHpResource = 300;
+                log("[Not So Realistic] IFAK set to default", miscConfig.enableLogs, LogTextColor.GREEN);
+                
+            }
+            
+            if (medsConfig.afakChanges) {
+                applyChanges(afak, medsConfig, "afak");
+                afak._props.MaxHpResource = afakHP;
+                log("[Not So Realistic] Changing AFAK", miscConfig.enableLogs, LogTextColor.GREEN);
+                
+            } else {
+                afak._props.effects_damage["LightBleeding"] = {
+                    delay: 0,
+                    duration: 0,
+                    fadeOut: 0,
+                    cost: 30
+                },
+                afak._props.effects_damage["HeavyBleeding"] = {
+                    delay: 0,
+                    duration: 0,
+                    fadeOut: 0,
+                    cost: 170
+                },
+                afak._props.effects_damage["RadExposure"] = {
+                    delay: 0,
+                    duration: 0,
+                    fadeOut: 0,
+                    cost: 0
+                }
+                afak._props.MaxHpResource = 400;
+                log("[Not So Realistic] AFAK set to default", miscConfig.enableLogs, LogTextColor.GREEN);
+                
+            }
 
-        vaselin._props.MaxHpResource = vaselinUsage;
-        goldenStar._props.MaxHpResource = goldenStarUsage;
-        aluminiumSplint._props.MaxHpResource = aluminiumSplintUsage;
-        cms._props.MaxHpResource = cmsUsage;
-        survivalKit._props.MaxHpResource = survivalKitUsage;
+            calocB._props.MaxHpResource = calocUsage;
+            armyBandages._props.MaxHpResource = armyBandageUsage;
+            analginPainkillers._props.MaxHpResource = analginPainkillersUsage;
+            augmentin._props.MaxHpResource = augmentinUsage;
+            ibuprofen._props.MaxHpResource = ibuprofenUsage;
 
-        log("[Not So Realistic] Meds changes applied!", miscConfig.enableLogs, LogTextColor.GREEN);
+            vaselin._props.MaxHpResource = vaselinUsage;
+            goldenStar._props.MaxHpResource = goldenStarUsage;
+            aluminiumSplint._props.MaxHpResource = aluminiumSplintUsage;
+            cms._props.MaxHpResource = cmsUsage;
+            survivalKit._props.MaxHpResource = survivalKitUsage;
 
+            log("[Not So Realistic] Meds changes applied!", miscConfig.enableLogs, LogTextColor.GREEN);
+        } else {
+            log("[Not So Realistic] Meds changes disabled!", miscConfig.enableLogs, LogTextColor.GREEN);
+        }
         
         log("========================================================================================", miscConfig.enableLogs, LogTextColor.GREEN);
 
