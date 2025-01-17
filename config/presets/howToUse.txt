@@ -1,0 +1,12 @@
+Just drag and drop the preset files into the config folder ans overwrite the existing ones. 
+
+Make sure to backup your configs before doing so.
+
+  _   _       _          _____             _____            _ _     _   _      
+ | \ | |     | |        / ____|           |  __ \          | (_)   | | (_)     
+ |  \| | ___ | |_      | (___   ___       | |__) |___  __ _| |_ ___| |_ _  ___ 
+ | . ` |/ _ \| __|      \___ \ / _ \      |  _  // _ \/ _` | | / __| __| |/ __|
+ | |\  | (_) | |_       ____) | (_) |     | | \ \  __/ (_| | | \__ \ |_| | (__ 
+ |_| \_|\___/ \__|     |_____/ \___/      |_|  \_\___|\__,_|_|_|___/\__|_|\___|
+                                                                               
+                                                                               

@@ -1,0 +1,7 @@
+{
+    "enable": true,
+    "bluntDamageMultiplier": 1.2,
+    "damageMultiplier": 1.1,
+    "penetrationPowerMultiplier": 1.1,
+    "armorDamageMultiplier": 1.1
+}
