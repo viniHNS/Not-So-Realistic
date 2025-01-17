@@ -3,6 +3,8 @@ import { IPostDBLoadMod } from "@spt/models/external/IPostDBLoadMod";
 import { DatabaseServer } from "@spt/servers/DatabaseServer";
 import { IPreSptLoadMod } from "@spt/models/external/IPreSptLoadMod";
 import { ILogger } from "@spt/models/spt/utils/ILogger";
+import { BaseClasses } from "@spt/models/enums/BaseClasses";
+import { ItemHelper } from "@spt/helpers/ItemHelper";
 import { LogTextColor } from "@spt/models/spt/logging/LogTextColor";
 import { JsonUtil } from "@spt/utils/JsonUtil";
 import { VFS } from "@spt/utils/VFS";
@@ -12,8 +14,11 @@ import { IDHelper } from "./IDHelper";
 import medsConfig from "../config/medsConfig.json";
 import recoilConfig from "../config/recoilConfig.json";
 import qolConfig from "../config/qolConfig.json";
+import ammoConfig from "../config/ammoConfig.json";
+import miscConfig from "../config/misc.json";
 import paracetamol from "../db/buffs/paracetamol.json";
 import exodrine from "../db/buffs/exodrine.json";
+import { ITemplateItem } from "@spt/models/eft/common/tables/ITemplateItem";
 
 class Mod implements IPostDBLoadMod, IPreSptLoadMod
 {
@@ -33,6 +38,8 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
         const databaseServer = container.resolve<DatabaseServer>("DatabaseServer");
 
         const idHelper = new IDHelper;
+
+        const itemHelper = container.resolve<ItemHelper>("ItemHelper");
 
         // Get all the in-memory json found in /assets/database
         const tables = databaseServer.getTables();
@@ -55,27 +62,33 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
         const cmsUsage: number = medsConfig.cmsUsage;
         const survivalKitUsage: number = medsConfig.survivalKitUsage;
 
-
         // Find the meds item by its Id (thanks NoNeedName)
-        const carKit = tables.templates.items[idHelper.CAR_FIRST_AID];
-        const salewa = tables.templates.items[idHelper.SALEWA];
-        const ifak = tables.templates.items[idHelper.IFAK];
-        const afak = tables.templates.items[idHelper.AFAK];
-        const grizzly = tables.templates.items[idHelper.GRIZZLY];
-        const ai2 = tables.templates.items[idHelper.AI2_MEDKIT];
-        const calocB = tables.templates.items[idHelper.CALOC_B];
-        const armyBandages = tables.templates.items[idHelper.ARMY_BANDAGE];
+        const carKit: ITemplateItem = tables.templates.items[idHelper.CAR_FIRST_AID];
+        const salewa: ITemplateItem = tables.templates.items[idHelper.SALEWA];
+        const ifak: ITemplateItem = tables.templates.items[idHelper.IFAK];
+        const afak: ITemplateItem = tables.templates.items[idHelper.AFAK];
+        const grizzly: ITemplateItem = tables.templates.items[idHelper.GRIZZLY];
+        const ai2: ITemplateItem = tables.templates.items[idHelper.AI2_MEDKIT];
+        const calocB: ITemplateItem = tables.templates.items[idHelper.CALOC_B];
+        const armyBandages: ITemplateItem = tables.templates.items[idHelper.ARMY_BANDAGE];
 
-        const analginPainkillers = tables.templates.items[idHelper.ANALGIN];
-        const augmentin = tables.templates.items[idHelper.AUGMENTIN];
-        const ibuprofen = tables.templates.items[idHelper.IBUPROFEN];
-        const vaselin = tables.templates.items[idHelper.VASELIN];
-        const goldenStar = tables.templates.items[idHelper.GOLDEN_STAR];
+        const analginPainkillers: ITemplateItem = tables.templates.items[idHelper.ANALGIN];
+        const augmentin: ITemplateItem = tables.templates.items[idHelper.AUGMENTIN];
+        const ibuprofen: ITemplateItem = tables.templates.items[idHelper.IBUPROFEN];
+        const vaselin: ITemplateItem = tables.templates.items[idHelper.VASELIN];
+        const goldenStar: ITemplateItem = tables.templates.items[idHelper.GOLDEN_STAR];
 
-        const aluminiumSplint = tables.templates.items[idHelper.ALUMINIUM_SPLINT];
+        const aluminiumSplint: ITemplateItem = tables.templates.items[idHelper.ALUMINIUM_SPLINT];
 
-        const survivalKit = tables.templates.items[idHelper.SURVIVAL_KIT];
-        const cms = tables.templates.items[idHelper.CMS];
+        const survivalKit: ITemplateItem = tables.templates.items[idHelper.SURVIVAL_KIT];
+        const cms: ITemplateItem = tables.templates.items[idHelper.CMS];
+
+        const Nato762: string = "Caliber762x51";
+        const Ru762_54: string = "Caliber762x54R";
+        const Lapua338: string = "Caliber86x70";
+        const Ru12_7: string = "Caliber127x55";
+        const Ru762_39: string = "Caliber762x39";
+
 
         //#endregion
 
@@ -137,6 +150,12 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
             
         }
 
+        function log(text: string, enable: boolean, color: LogTextColor): void {
+            if (enable) {
+                logger2.logWithColor(text, color);
+            }
+        }
+
         //#endregion
 
 
@@ -147,7 +166,9 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
         if (medsConfig.grizzlyChanges) {
             applyChanges(grizzly, medsConfig, "Grizzly");
             grizzly._props.MaxHpResource = grizzlyHP;
-            logger2.logWithColor(`[Not So Realistic] Changing Grizzly`, LogTextColor.GREEN);
+            log("[Not So Realistic] Changing Grizzly", miscConfig.enableLogs, LogTextColor.GREEN);
+            
+            
         } else {
             grizzly._props.effects_damage["LightBleeding"] = {
                 delay: 0,
@@ -180,13 +201,14 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
                 cost: 0
             }
             grizzly._props.MaxHpResource = 1800;
-            logger2.logWithColor(`[Not So Realistic] Grizzly set to default`, LogTextColor.GREEN);
+            log("[Not So Realistic] Grizzly set to default", miscConfig.enableLogs, LogTextColor.GREEN
+            
         }
         
         if (medsConfig.ai2Changes) {
             applyChanges(ai2, medsConfig, "ai2");
             ai2._props.MaxHpResource = ai2HP;
-            logger2.logWithColor(`[Not So Realistic] Changing AI-2`, LogTextColor.GREEN);
+            log("[Not So Realistic] Changing AI-2", miscConfig.enableLogs, LogTextColor.GREEN);
         } else {
             ai2._props.effects_damage["RadExposure"] = {
                 delay: 0,
@@ -195,13 +217,15 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
                 cost: 0
             }
             ai2._props.MaxHpResource = 100;
-            logger2.logWithColor(`[Not So Realistic] AI-2 set to default`, LogTextColor.GREEN);
+            log("[Not So Realistic] AI-2 set to default", miscConfig.enableLogs, LogTextColor.GREEN);
+            
         }
         
         if (medsConfig.carKitChanges) {
             applyChanges(carKit, medsConfig, "carKit");
             carKit._props.MaxHpResource = carKitHP;
-            logger2.logWithColor(`[Not So Realistic] Changing Car First Aid Kit`, LogTextColor.GREEN);
+            log("[Not So Realistic] Changing Car First Aid Kit", miscConfig.enableLogs, LogTextColor.GREEN);
+            
         } else {
             carKit._props.effects_damage["LightBleeding"] = {
                 delay: 0,
@@ -210,13 +234,15 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
                 cost: 50
             }
             carKit._props.MaxHpResource = 220;
-            logger2.logWithColor(`[Not So Realistic] Car First Aid Kit set to default`, LogTextColor.GREEN);
+            log("[Not So Realistic] Car First Aid Kit set to default", miscConfig.enableLogs, LogTextColor.GREEN);
+            
         }
         
         if (medsConfig.salewaChanges) {
             applyChanges(salewa, medsConfig, "salewa");
             salewa._props.MaxHpResource = salewaHP;
-            logger2.logWithColor(`[Not So Realistic] Changing Salewa`, LogTextColor.GREEN);
+            log("[Not So Realistic] Changing Salewa", miscConfig.enableLogs, LogTextColor.GREEN);
+            
         } else {
             salewa._props.effects_damage["LightBleeding"] = {
                 delay: 0,
@@ -231,13 +257,15 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
                 cost: 175
             },
             salewa._props.MaxHpResource = 400;
-            logger2.logWithColor(`[Not So Realistic] Salewa set to default`, LogTextColor.GREEN);
+            log("[Not So Realistic] Salewa set to default", miscConfig.enableLogs, LogTextColor.GREEN);
+            
         }
         
         if (medsConfig.ifakChanges) {
             applyChanges(ifak, medsConfig, "ifak");
             ifak._props.MaxHpResource = ifakHP;
-            logger2.logWithColor(`[Not So Realistic] Changing IFAK`, LogTextColor.GREEN);
+            log("[Not So Realistic] Changing IFAK", miscConfig.enableLogs, LogTextColor.GREEN);
+            
         } else {
             ifak._props.effects_damage["LightBleeding"] = {
                 delay: 0,
@@ -258,13 +286,15 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
                 cost: 0
             }
             ifak._props.MaxHpResource = 300;
-            logger2.logWithColor(`[Not So Realistic] IFAK set to default`, LogTextColor.GREEN);
+            log("[Not So Realistic] IFAK set to default", miscConfig.enableLogs, LogTextColor.GREEN);
+            
         }
         
         if (medsConfig.afakChanges) {
             applyChanges(afak, medsConfig, "afak");
             afak._props.MaxHpResource = afakHP;
-            logger2.logWithColor(`[Not So Realistic] Changing AFAK`, LogTextColor.GREEN);
+            log("[Not So Realistic] Changing AFAK", miscConfig.enableLogs, LogTextColor.GREEN);
+            
         } else {
             afak._props.effects_damage["LightBleeding"] = {
                 delay: 0,
@@ -285,7 +315,8 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
                 cost: 0
             }
             afak._props.MaxHpResource = 400;
-            logger2.logWithColor(`[Not So Realistic] AFAK set to default`, LogTextColor.GREEN);
+            log("[Not So Realistic] AFAK set to default", miscConfig.enableLogs, LogTextColor.GREEN);
+            
         }
 
         calocB._props.MaxHpResource = calocUsage;
@@ -300,9 +331,11 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
         cms._props.MaxHpResource = cmsUsage;
         survivalKit._props.MaxHpResource = survivalKitUsage;
 
-        logger2.logWithColor("[Not So Realistic] All meds changes have been applied successfully!", LogTextColor.GREEN);
+        log("[Not So Realistic] Meds changes applied!", miscConfig.enableLogs, LogTextColor.GREEN);
 
-        logger2.logWithColor("========================================================================================", LogTextColor.GREEN);
+        
+        log("========================================================================================", miscConfig.enableLogs, LogTextColor.GREEN);
+
         // -------------------------------------------------------------------------------------
         //#endregion
 
@@ -414,8 +447,61 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
 
         //#endregion
 
+        //#region Ammo Changes
+        const item = Object.values(tables.templates.items);
+        const allAmmo = item.filter(x => itemHelper.isOfBaseclass(x._id, BaseClasses.AMMO));
+        const allArmor = item.filter(x => itemHelper.isOfBaseclass(x._id, BaseClasses.ARMOR));
+
+        const all762x51 = allAmmo.filter(x => x._props.Caliber == Nato762);
+        const all762x54 = allAmmo.filter(x => x._props.Caliber == Ru762_54);
+        const all338 = allAmmo.filter(x => x._props.Caliber == Lapua338);
+        const all127x55 = allAmmo.filter(x => x._props.Caliber == Ru12_7);
+        const all762x39 = allAmmo.filter(x => x._props.Caliber == Ru762_39);
+
+        if(ammoConfig.enable){
+            for(const armor of allArmor){
+                armor._props.BluntThroughput *= ammoConfig.bluntDamageMultiplier;
+            }
+
+            for(const ammo762x51 of all762x51){
+                ammo762x51._props.Damage *= Math.round(ammoConfig.damageMultiplier);
+                ammo762x51._props.PenetrationPower *= Math.round(ammoConfig.penetrationPowerMultiplier);
+                ammo762x51._props.ArmorDamage *= Math.round(ammoConfig.armorDamageMultiplier);
+            }
+            for(const ammo762x54 of all762x54){
+                ammo762x54._props.Damage *= Math.round(ammoConfig.damageMultiplier);
+                ammo762x54._props.PenetrationPower *= Math.round(ammoConfig.penetrationPowerMultiplier);
+                ammo762x54._props.ArmorDamage *= Math.round(ammoConfig.armorDamageMultiplier);
+            }
+            for(const ammo338 of all338){
+                ammo338._props.Damage *= Math.round(ammoConfig.damageMultiplier);
+                ammo338._props.PenetrationPower *= Math.round(ammoConfig.penetrationPowerMultiplier);
+                ammo338._props.ArmorDamage *= Math.round(ammoConfig.armorDamageMultiplier);
+            }
+            for(const ammo127x55 of all127x55){
+                ammo127x55._props.Damage *= Math.round(ammoConfig.damageMultiplier);
+                ammo127x55._props.PenetrationPower *= Math.round(ammoConfig.penetrationPowerMultiplier);
+                ammo127x55._props.ArmorDamage *= Math.round(ammoConfig.armorDamageMultiplier);
+            }
+            for(const ammo762x39 of all762x39){
+                ammo762x39._props.Damage *= Math.round(ammoConfig.damageMultiplier);
+                ammo762x39._props.PenetrationPower *= Math.round(ammoConfig.penetrationPowerMultiplier);
+                ammo762x39._props.ArmorDamage *= Math.round(ammoConfig.armorDamageMultiplier);
+            }
+            
+            log("[Not So Realistic] Ammo changes applied!", miscConfig.enableLogs, LogTextColor.GREEN);
+            
+            
+        } else { 
+            log("[Not So Realistic] Ammo changes disabled!", miscConfig.enableLogs, LogTextColor.GREEN);
+            
+        }
 
 
+
+        //#endregion
+
+       
 
         //#region Recoil Changes
         // Changes in the Recoil of the weapons ------------------------------------------------
@@ -437,7 +523,7 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
 
                         if(weapons._props.weapFireType.includes("doubleaction") && qolConfig.enable){
                             weapons._props.DoubleActionAccuracyPenalty = qolConfig.doubleActionAccuracyPenalty;
-                            logger2.logWithColor(`[Not So Realistic] Changing the Double Action Accuracy Penalty from ${weapons._name} to ${qolConfig.doubleActionAccuracyPenalty}`, LogTextColor.GREEN);
+                            log(`[Not So Realistic] Changing the Double Action Accuracy Penalty from ${weapons._name} to ${qolConfig.doubleActionAccuracyPenalty}`, miscConfig.enableLogs, LogTextColor.GREEN);
                         }
 
                         const recoilConfigMap = {
@@ -525,7 +611,7 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
 
                         if (recoilConfigMap[weapClass]) {
                             const config = recoilConfigMap[weapClass];
-                            logger2.logWithColor(`[Not So Realistic] Changing the recoil of ${weapons._name}`, LogTextColor.GREEN);
+                            log(`[Not So Realistic] Changing the recoil of ${weapons._name}`, miscConfig.enableLogs, LogTextColor.GREEN);
                             weapons._props.RecoilForceUp *= (1 - config.RecoilUp);
                             weapons._props.RecoilForceBack *= (1 - config.RecoilBack);
                             weapons._props.RecoilReturnSpeedHandRotation *= (1 + config.RecoilConvergence);
@@ -535,16 +621,16 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
                             weapons._props.RecoilCategoryMultiplierHandRotation *= (1 - config.RecoilCategoryMultiplierHandRotation);
                             weapons._props.RecoilStableAngleIncreaseStep *= (1 - config.RecoilStableAngleIncreaseStep);
                         } else {
-                            logger2.logWithColor(`[Not So Realistic] ${weapons._name} is a ${weapClass}. Ignoring...`, LogTextColor.YELLOW); 
+                            log(`[Not So Realistic] ${weapons._name} is a ${weapClass}. Ignoring...`, miscConfig.enableLogs, LogTextColor.YELLOW);
                         }
                     }
                 }
             }
-            logger2.logWithColor("[Not So Realistic] All weapon recoil changes have been applied successfully!", LogTextColor.GREEN);
+            log("[Not So Realistic] Weapon recoil changes applied!", miscConfig.enableLogs, LogTextColor.GREEN);
         } else {
-            logger2.logWithColor("[Not So Realistic] All weapon recoil settings remain default. No changes applied.", LogTextColor.YELLOW);
+            log("[Not So Realistic] All weapon recoil settings remain default. No changes applied.", miscConfig.enableLogs, LogTextColor.YELLOW);
         }
-        logger2.logWithColor("========================================================================================", LogTextColor.GREEN);
+        log("========================================================================================", miscConfig.enableLogs, LogTextColor.GREEN);
 
         //#endregion
         
