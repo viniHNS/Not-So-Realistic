@@ -1,4 +1,6 @@
 {
+  "enable": true,
+
   "calocUsage": 5,
   "armyBandageUsage": 4,
   "analginPainkillersUsage": 10,
