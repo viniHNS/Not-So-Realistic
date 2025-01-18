@@ -88,12 +88,7 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
         const Lapua338: string = "Caliber86x70";
         const Ru12_7: string = "Caliber127x55";
         const Ru762_39: string = "Caliber762x39";
-
-
         //#endregion
-
-
-
 
         //#region Functions
         // Meds Changes --------------------------------------------------------------------
@@ -155,21 +150,14 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
                 logger2.logWithColor(text, color);
             }
         }
-
         //#endregion
-
-
-
 
         //#region Meds Changes
         if(medsConfig.enable){
-
-        
             if (medsConfig.grizzlyChanges) {
                 applyChanges(grizzly, medsConfig, "Grizzly");
                 grizzly._props.MaxHpResource = grizzlyHP;
-                log("[Not So Realistic] Changing Grizzly", miscConfig.enableLogs, LogTextColor.GREEN);
-                
+                log("[Not So Realistic] Changing Grizzly", miscConfig.enableLogs, LogTextColor.GREEN);   
             } else {
                 grizzly._props.effects_damage["LightBleeding"] = {
                     delay: 0,
@@ -235,14 +223,12 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
                 }
                 carKit._props.MaxHpResource = 220;
                 log("[Not So Realistic] Car First Aid Kit set to default", miscConfig.enableLogs, LogTextColor.GREEN);
-                
             }
             
             if (medsConfig.salewaChanges) {
                 applyChanges(salewa, medsConfig, "salewa");
                 salewa._props.MaxHpResource = salewaHP;
                 log("[Not So Realistic] Changing Salewa", miscConfig.enableLogs, LogTextColor.GREEN);
-                
             } else {
                 salewa._props.effects_damage["LightBleeding"] = {
                     delay: 0,
@@ -258,14 +244,12 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
                 },
                 salewa._props.MaxHpResource = 400;
                 log("[Not So Realistic] Salewa set to default", miscConfig.enableLogs, LogTextColor.GREEN);
-                
             }
             
             if (medsConfig.ifakChanges) {
                 applyChanges(ifak, medsConfig, "ifak");
                 ifak._props.MaxHpResource = ifakHP;
-                log("[Not So Realistic] Changing IFAK", miscConfig.enableLogs, LogTextColor.GREEN);
-                
+                log("[Not So Realistic] Changing IFAK", miscConfig.enableLogs, LogTextColor.GREEN);  
             } else {
                 ifak._props.effects_damage["LightBleeding"] = {
                     delay: 0,
@@ -286,15 +270,13 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
                     cost: 0
                 }
                 ifak._props.MaxHpResource = 300;
-                log("[Not So Realistic] IFAK set to default", miscConfig.enableLogs, LogTextColor.GREEN);
-                
+                log("[Not So Realistic] IFAK set to default", miscConfig.enableLogs, LogTextColor.GREEN);  
             }
             
             if (medsConfig.afakChanges) {
                 applyChanges(afak, medsConfig, "afak");
                 afak._props.MaxHpResource = afakHP;
                 log("[Not So Realistic] Changing AFAK", miscConfig.enableLogs, LogTextColor.GREEN);
-                
             } else {
                 afak._props.effects_damage["LightBleeding"] = {
                     delay: 0,
@@ -316,7 +298,6 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
                 }
                 afak._props.MaxHpResource = 400;
                 log("[Not So Realistic] AFAK set to default", miscConfig.enableLogs, LogTextColor.GREEN);
-                
             }
 
             calocB._props.MaxHpResource = calocUsage;
@@ -340,9 +321,6 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
 
         // -------------------------------------------------------------------------------------
         //#endregion
-
-
-
 
         //#region Individual Weapons Changes
         const kriss_9mm = tables.templates.items[idHelper.KRISS_VECTOR_9MM];
@@ -441,7 +419,6 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
             "5a0d63621526d8dba31fe3bf",
             "5a9fbacda2750c00141e080f",
             "64942bfc6ee699f6890dff95"
-              
         ]
 
         RPD_520mm._props.Slots[1]._props.filters[0].Filter.push(...muzzlesToAdd);
@@ -493,22 +470,15 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
             
             log("[Not So Realistic] Ammo changes applied!", miscConfig.enableLogs, LogTextColor.GREEN);
             
-            
         } else { 
             log("[Not So Realistic] Ammo changes disabled!", miscConfig.enableLogs, LogTextColor.GREEN);
             
         }
-
-
-
         //#endregion
-
-       
 
         //#region Recoil Changes
         // Changes in the Recoil of the weapons ------------------------------------------------
         if(recoilConfig.changes){
-
             tables.globals.config.Aiming.RecoilCrank = recoilConfig.recoilCrank;
             tables.globals.config.Aiming.RecoilDamping = recoilConfig.recoilDamping;
             tables.globals.config.Aiming.RecoilHandDamping = recoilConfig.recoilHandDamping;
@@ -633,11 +603,7 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
             log("[Not So Realistic] All weapon recoil settings remain default. No changes applied.", miscConfig.enableLogs, LogTextColor.YELLOW);
         }
         log("========================================================================================", miscConfig.enableLogs, LogTextColor.GREEN);
-
         //#endregion
-        
-        
-        
         
         //#region DB Stuff
 
@@ -745,7 +711,6 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
         //#endregion
 
     }
-    
 }
 
 module.exports = { mod: new Mod() }
