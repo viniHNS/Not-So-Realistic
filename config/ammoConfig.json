@@ -1,5 +1,5 @@
 {
-    "enable": true,
+    "enable": false,
     "bluntDamageMultiplier": 1.0,
     "damageMultiplier": 1.0,
     "penetrationPowerMultiplier": 1.0,

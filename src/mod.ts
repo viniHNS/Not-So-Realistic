@@ -1,15 +1,15 @@
 import { DependencyContainer } from "tsyringe";
 import { IPostDBLoadMod } from "@spt/models/external/IPostDBLoadMod";
 import { DatabaseServer } from "@spt/servers/DatabaseServer";
-import { IPreSptLoadMod } from "@spt/models/external/IPreSptLoadMod";
+import { IPreSptLoadMod } from "@spt/models/external/IpreSptLoadMod";
 import { ILogger } from "@spt/models/spt/utils/ILogger";
 import { BaseClasses } from "@spt/models/enums/BaseClasses";
 import { ItemHelper } from "@spt/helpers/ItemHelper";
 import { LogTextColor } from "@spt/models/spt/logging/LogTextColor";
 import { JsonUtil } from "@spt/utils/JsonUtil";
-import { VFS } from "@spt/utils/VFS";
-import { ImporterUtil } from "@spt/utils/ImporterUtil";
+import { ITemplateItem } from "@spt/models/eft/common/tables/ITemplateItem";
 import path from "path";
+import fs from "fs";
 import { IDHelper } from "./IDHelper";
 import medsConfig from "../config/medsConfig.json";
 import recoilConfig from "../config/recoilConfig.json";
@@ -18,326 +18,39 @@ import ammoConfig from "../config/ammoConfig.json";
 import miscConfig from "../config/misc.json";
 import paracetamol from "../db/buffs/paracetamol.json";
 import exodrine from "../db/buffs/exodrine.json";
-import { ITemplateItem } from "@spt/models/eft/common/tables/ITemplateItem";
 
-class Mod implements IPostDBLoadMod, IPreSptLoadMod
-{
-    preSptLoad(container: DependencyContainer): void 
-    {
-        // get the logger from the server container
-        const logger = container.resolve<ILogger>("WinstonLogger");
-        logger.logWithColor("[ViniHNS] Not so realistic loading!", LogTextColor.GREEN);
-    }
+class Mod implements IPostDBLoadMod, IPreSptLoadMod {
+    private readonly MOD_NAME = "[ViniHNS] Not So Realistic";
+    private readonly idHelper = new IDHelper();
 
-    public postDBLoad(container: DependencyContainer): void 
-    {
-        //#region Constants
+    // Caliber constants
+    private readonly CALIBERS = {
+        NATO_762: "Caliber762x51",
+        RU_762_54: "Caliber762x54R",
+        LAPUA_338: "Caliber86x70",
+        RU_12_7: "Caliber127x55",
+        RU_762_39: "Caliber762x39"
+    };
 
-        const logger2 = container.resolve<ILogger>("WinstonLogger");
-        // get database from server
-        const databaseServer = container.resolve<DatabaseServer>("DatabaseServer");
+    // Weapons excluded from recoil changes
+    private readonly RECOIL_EXCLUDED_WEAPONS = [
+        "6643edda4a05be2737da3134",
+        "687e3a7e606386dda2e318f4"
+    ];
 
-        const idHelper = new IDHelper;
-
-        const itemHelper = container.resolve<ItemHelper>("ItemHelper");
-
-        // Get all the in-memory json found in /assets/database
-        const tables = databaseServer.getTables();
-
-        const carKitHP: number = medsConfig.carKitHP;
-        const salewaHP: number = medsConfig.salewaHP;
-        const ifakHP: number = medsConfig.ifakHP;
-        const afakHP: number = medsConfig.afakHP;
-        const grizzlyHP: number = medsConfig.grizzlyHP;
-        const ai2HP: number = medsConfig.ai2HP;
-    
-        const calocUsage: number = medsConfig.calocUsage;
-        const armyBandageUsage: number = medsConfig.armyBandageUsage;
-        const analginPainkillersUsage: number = medsConfig.analginPainkillersUsage;
-        const augmentinUsage: number = medsConfig.augmentinUsage;
-        const ibuprofenUsage: number = medsConfig.ibuprofenUsage;
-        const vaselinUsage: number = medsConfig.vaselinUsage;
-        const goldenStarUsage: number = medsConfig.goldenStarUsage;
-        const aluminiumSplintUsage: number = medsConfig.aluminiumSplintUsage;
-        const cmsUsage: number = medsConfig.cmsUsage;
-        const survivalKitUsage: number = medsConfig.survivalKitUsage;
-
-        // Find the meds item by its Id (thanks NoNeedName)
-        const carKit: ITemplateItem = tables.templates.items[idHelper.CAR_FIRST_AID];
-        const salewa: ITemplateItem = tables.templates.items[idHelper.SALEWA];
-        const ifak: ITemplateItem = tables.templates.items[idHelper.IFAK];
-        const afak: ITemplateItem = tables.templates.items[idHelper.AFAK];
-        const grizzly: ITemplateItem = tables.templates.items[idHelper.GRIZZLY];
-        const ai2: ITemplateItem = tables.templates.items[idHelper.AI2_MEDKIT];
-        const calocB: ITemplateItem = tables.templates.items[idHelper.CALOC_B];
-        const armyBandages: ITemplateItem = tables.templates.items[idHelper.ARMY_BANDAGE];
-
-        const analginPainkillers: ITemplateItem = tables.templates.items[idHelper.ANALGIN];
-        const augmentin: ITemplateItem = tables.templates.items[idHelper.AUGMENTIN];
-        const ibuprofen: ITemplateItem = tables.templates.items[idHelper.IBUPROFEN];
-        const vaselin: ITemplateItem = tables.templates.items[idHelper.VASELIN];
-        const goldenStar: ITemplateItem = tables.templates.items[idHelper.GOLDEN_STAR];
-
-        const aluminiumSplint: ITemplateItem = tables.templates.items[idHelper.ALUMINIUM_SPLINT];
-
-        const survivalKit: ITemplateItem = tables.templates.items[idHelper.SURVIVAL_KIT];
-        const cms: ITemplateItem = tables.templates.items[idHelper.CMS];
-
-        const Nato762: string = "Caliber762x51";
-        const Ru762_54: string = "Caliber762x54R";
-        const Lapua338: string = "Caliber86x70";
-        const Ru12_7: string = "Caliber127x55";
-        const Ru762_39: string = "Caliber762x39";
-        //#endregion
-
-        //#region Functions
-        // Meds Changes --------------------------------------------------------------------
-        function setEffectDamage(item: any, effect: string, configKey: string, config: any): void {
-            if (config[configKey]) {
-                item._props.effects_damage[effect] = {
-                    delay: 0,
-                    duration: 0,
-                    fadeOut: 0,
-                    cost: config[configKey]
-                };
-            }
-        }
-    
-        function removeEffect(item: any, effect: string): void {
-            //Remove the effect from array like this one item._props.effects_damage["DestroyedPart"] 
-            delete item._props.effects_damage[effect]
-
-        }
-    
-        function setSurgeryEffect(item: any, configKey: string, config: any): void {
-            if (config[configKey]) {
-                item._props.effects_damage["DestroyedPart"] = {
-                    delay: 0,
-                    duration: 0,
-                    fadeOut: 0,
-                    healthPenaltyMin: 60,
-                    healthPenaltyMax: 72,
-                    cost: config[configKey]
-                };
-            }
-        }
-    
-        function applyChanges(item: any, config: any, prefix: string): void {
-
-            const effects = [
-                { effect: "Fracture", canHeal: `${prefix}CanHealFractures`, costKey: `${prefix}FractureHealCost` },
-                { effect: "DestroyedPart", canHeal: `${prefix}CanDoSurgery`, costKey: `${prefix}SurgeryCost`, isSurgery: true },
-                { effect: "HeavyBleeding", canHeal: `${prefix}CanHealHeavyBleeding`, costKey: `${prefix}HeavyBleedingHealCost` },
-                { effect: "LightBleeding", canHeal: `${prefix}CanHealLightBleeding`, costKey: `${prefix}LightBleedingHealCost` },
-            ];
-
-            effects.forEach(({ effect, canHeal, costKey, isSurgery }) => {
-                if (config[canHeal]) {
-                    if (isSurgery) {
-                        setSurgeryEffect(item, costKey, config);
-                    } else {
-                        setEffectDamage(item, effect, costKey, config);
-                    }
-                } else {
-                    removeEffect(item, effect);
-                }
-            });
-            
-        }
-
-        function log(text: string, enable: boolean, color: LogTextColor): void {
-            if (enable) {
-                logger2.logWithColor(text, color);
-            }
-        }
-        //#endregion
-
-        //#region Meds Changes
-        if(medsConfig.enable){
-            if (medsConfig.grizzlyChanges) {
-                applyChanges(grizzly, medsConfig, "Grizzly");
-                grizzly._props.MaxHpResource = grizzlyHP;
-                log("[Not So Realistic] Changing Grizzly", miscConfig.enableLogs, LogTextColor.GREEN);   
-            } else {
-                grizzly._props.effects_damage["LightBleeding"] = {
-                    delay: 0,
-                    duration: 0,
-                    fadeOut: 0,
-                    cost: 40
-                },
-                grizzly._props.effects_damage["HeavyBleeding"] = {
-                    delay: 0,
-                    duration: 0,
-                    fadeOut: 0,
-                    cost: 130
-                },
-                grizzly._props.effects_damage["Fracture"] = {
-                    delay: 0,
-                    duration: 0,
-                    fadeOut: 0,
-                    cost: 50
-                },
-                grizzly._props.effects_damage["Contusion"] = {
-                    delay: 0,
-                    duration: 0,
-                    fadeOut: 0,
-                    cost: 0
-                },
-                grizzly._props.effects_damage["RadExposure"] = {
-                    delay: 0,
-                    duration: 0,
-                    fadeOut: 0,
-                    cost: 0
-                }
-                grizzly._props.MaxHpResource = 1800;
-                log("[Not So Realistic] Grizzly set to default", miscConfig.enableLogs, LogTextColor.GREEN);
-            }
-            
-            if (medsConfig.ai2Changes) {
-                applyChanges(ai2, medsConfig, "ai2");
-                ai2._props.MaxHpResource = ai2HP;
-                log("[Not So Realistic] Changing AI-2", miscConfig.enableLogs, LogTextColor.GREEN);
-            } else {
-                ai2._props.effects_damage["RadExposure"] = {
-                    delay: 0,
-                    duration: 0,
-                    fadeOut: 0,
-                    cost: 0
-                }
-                ai2._props.MaxHpResource = 100;
-                log("[Not So Realistic] AI-2 set to default", miscConfig.enableLogs, LogTextColor.GREEN);
-                
-            }
-            
-            if (medsConfig.carKitChanges) {
-                applyChanges(carKit, medsConfig, "carKit");
-                carKit._props.MaxHpResource = carKitHP;
-                log("[Not So Realistic] Changing Car First Aid Kit", miscConfig.enableLogs, LogTextColor.GREEN);
-                
-            } else {
-                carKit._props.effects_damage["LightBleeding"] = {
-                    delay: 0,
-                    duration: 0,
-                    fadeOut: 0,
-                    cost: 50
-                }
-                carKit._props.MaxHpResource = 220;
-                log("[Not So Realistic] Car First Aid Kit set to default", miscConfig.enableLogs, LogTextColor.GREEN);
-            }
-            
-            if (medsConfig.salewaChanges) {
-                applyChanges(salewa, medsConfig, "salewa");
-                salewa._props.MaxHpResource = salewaHP;
-                log("[Not So Realistic] Changing Salewa", miscConfig.enableLogs, LogTextColor.GREEN);
-            } else {
-                salewa._props.effects_damage["LightBleeding"] = {
-                    delay: 0,
-                    duration: 0,
-                    fadeOut: 0,
-                    cost: 45
-                },
-                salewa._props.effects_damage["HeavyBleeding"] = {
-                    delay: 0,
-                    duration: 0,
-                    fadeOut: 0,
-                    cost: 175
-                },
-                salewa._props.MaxHpResource = 400;
-                log("[Not So Realistic] Salewa set to default", miscConfig.enableLogs, LogTextColor.GREEN);
-            }
-            
-            if (medsConfig.ifakChanges) {
-                applyChanges(ifak, medsConfig, "ifak");
-                ifak._props.MaxHpResource = ifakHP;
-                log("[Not So Realistic] Changing IFAK", miscConfig.enableLogs, LogTextColor.GREEN);  
-            } else {
-                ifak._props.effects_damage["LightBleeding"] = {
-                    delay: 0,
-                    duration: 0,
-                    fadeOut: 0,
-                    cost: 30
-                },
-                ifak._props.effects_damage["HeavyBleeding"] = {
-                    delay: 0,
-                    duration: 0,
-                    fadeOut: 0,
-                    cost: 210
-                },
-                ifak._props.effects_damage["RadExposure"] = {
-                    delay: 0,
-                    duration: 0,
-                    fadeOut: 0,
-                    cost: 0
-                }
-                ifak._props.MaxHpResource = 300;
-                log("[Not So Realistic] IFAK set to default", miscConfig.enableLogs, LogTextColor.GREEN);  
-            }
-            
-            if (medsConfig.afakChanges) {
-                applyChanges(afak, medsConfig, "afak");
-                afak._props.MaxHpResource = afakHP;
-                log("[Not So Realistic] Changing AFAK", miscConfig.enableLogs, LogTextColor.GREEN);
-            } else {
-                afak._props.effects_damage["LightBleeding"] = {
-                    delay: 0,
-                    duration: 0,
-                    fadeOut: 0,
-                    cost: 30
-                },
-                afak._props.effects_damage["HeavyBleeding"] = {
-                    delay: 0,
-                    duration: 0,
-                    fadeOut: 0,
-                    cost: 170
-                },
-                afak._props.effects_damage["RadExposure"] = {
-                    delay: 0,
-                    duration: 0,
-                    fadeOut: 0,
-                    cost: 0
-                }
-                afak._props.MaxHpResource = 400;
-                log("[Not So Realistic] AFAK set to default", miscConfig.enableLogs, LogTextColor.GREEN);
-            }
-
-            calocB._props.MaxHpResource = calocUsage;
-            armyBandages._props.MaxHpResource = armyBandageUsage;
-            analginPainkillers._props.MaxHpResource = analginPainkillersUsage;
-            augmentin._props.MaxHpResource = augmentinUsage;
-            ibuprofen._props.MaxHpResource = ibuprofenUsage;
-
-            vaselin._props.MaxHpResource = vaselinUsage;
-            goldenStar._props.MaxHpResource = goldenStarUsage;
-            aluminiumSplint._props.MaxHpResource = aluminiumSplintUsage;
-            cms._props.MaxHpResource = cmsUsage;
-            survivalKit._props.MaxHpResource = survivalKitUsage;
-
-            log("[Not So Realistic] Meds changes applied!", miscConfig.enableLogs, LogTextColor.GREEN);
-        } else {
-            log("[Not So Realistic] Meds changes disabled!", miscConfig.enableLogs, LogTextColor.GREEN);
-        }
-        
-        log("========================================================================================", miscConfig.enableLogs, LogTextColor.GREEN);
-
-        // -------------------------------------------------------------------------------------
-        //#endregion
-
-        //#region Individual Weapons Changes
-        const kriss_9mm = tables.templates.items[idHelper.KRISS_VECTOR_9MM];
-        kriss_9mm._props.bFirerate = 1100;
-
-        const alpha_dog_supressor_9mm = tables.templates.items[idHelper.ALPHA_DOG_ALPHA_SUPRESSOR_9MM];
-        const scopesToAdd = [
-              "57ac965c24597706be5f975c",
-              "57aca93d2459771f2c7e26db",
-              "544a3f024bdc2d1d388b4568",
-              "544a3a774bdc2d3a388b4567",
-              "5d2dc3e548f035404a1a4798",
-              "57adff4f24597737f373b6e6",
-              "5c0517910db83400232ffee5",
-              "591c4efa86f7741030027726",
-              "570fd79bd2720bc7458b4583",
-              "570fd6c2d2720bc6458b457f",
+    // Weapon modifications constants
+    private readonly WEAPON_MODS = {
+        SCOPES_TO_ADD: [
+            "57ac965c24597706be5f975c",
+            "57aca93d2459771f2c7e26db",
+            "544a3f024bdc2d1d388b4568",
+            "544a3a774bdc2d3a388b4567",
+            "5d2dc3e548f035404a1a4798",
+            "57adff4f24597737f373b6e6",
+            "5c0517910db83400232ffee5",
+            "591c4efa86f7741030027726",
+            "570fd79bd2720bc7458b4583",
+            "570fd6c2d2720bc6458b457f",
               "558022b54bdc2dac148b458d",
               "5c07dd120db834001c39092d",
               "5c0a2cec0db834001b7ce47d",
@@ -395,14 +108,9 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
               "65392f611406374f82152ba5",
               "653931da5db71d30ab1d6296",
               "655f13e0a246670fb0373245",
-              "6567e751a715f85433025998"      
-        ]
-        alpha_dog_supressor_9mm._props.Slots[0]._props.filters[0].Filter.push(...scopesToAdd);
-
-        const RPD_520mm = tables.templates.items[idHelper.RPD_520mm];
-        const RPD_sawed_off_350mm = tables.templates.items[idHelper.RPD_SAWED_OFF_350mm];
-
-        const muzzlesToAdd = [
+              "6567e751a715f85433025998" 
+        ],
+        MUZZLES_TO_ADD: [
             "59d64fc686f774171b243fe2",
             "5a0d716f1526d8000d26b1e2",
             "5f633f68f5750b524b45f112",
@@ -420,297 +128,528 @@ class Mod implements IPostDBLoadMod, IPreSptLoadMod
             "5a9fbacda2750c00141e080f",
             "64942bfc6ee699f6890dff95"
         ]
+    };
 
-        RPD_520mm._props.Slots[1]._props.filters[0].Filter.push(...muzzlesToAdd);
-        RPD_sawed_off_350mm._props.Slots[0]._props.filters[0].Filter.push(...muzzlesToAdd);
-
-        //#endregion
-
-        //#region Ammo Changes
-        const item = Object.values(tables.templates.items);
-        const allAmmo = item.filter(x => itemHelper.isOfBaseclass(x._id, BaseClasses.AMMO));
-        const allArmor = item.filter(x => itemHelper.isOfBaseclass(x._id, BaseClasses.ARMOR));
-
-        const all762x51 = allAmmo.filter(x => x._props.Caliber == Nato762);
-        const all762x54 = allAmmo.filter(x => x._props.Caliber == Ru762_54);
-        const all338 = allAmmo.filter(x => x._props.Caliber == Lapua338);
-        const all127x55 = allAmmo.filter(x => x._props.Caliber == Ru12_7);
-        const all762x39 = allAmmo.filter(x => x._props.Caliber == Ru762_39);
-
-        if(ammoConfig.enable){
-            for(const armor of allArmor){
-                armor._props.BluntThroughput *= ammoConfig.bluntDamageMultiplier;
-            }
-
-            for(const ammo762x51 of all762x51){
-                ammo762x51._props.Damage *= Math.round(ammoConfig.damageMultiplier);
-                ammo762x51._props.PenetrationPower *= Math.round(ammoConfig.penetrationPowerMultiplier);
-                ammo762x51._props.ArmorDamage *= Math.round(ammoConfig.armorDamageMultiplier);
-            }
-            for(const ammo762x54 of all762x54){
-                ammo762x54._props.Damage *= Math.round(ammoConfig.damageMultiplier);
-                ammo762x54._props.PenetrationPower *= Math.round(ammoConfig.penetrationPowerMultiplier);
-                ammo762x54._props.ArmorDamage *= Math.round(ammoConfig.armorDamageMultiplier);
-            }
-            for(const ammo338 of all338){
-                ammo338._props.Damage *= Math.round(ammoConfig.damageMultiplier);
-                ammo338._props.PenetrationPower *= Math.round(ammoConfig.penetrationPowerMultiplier);
-                ammo338._props.ArmorDamage *= Math.round(ammoConfig.armorDamageMultiplier);
-            }
-            for(const ammo127x55 of all127x55){
-                ammo127x55._props.Damage *= Math.round(ammoConfig.damageMultiplier);
-                ammo127x55._props.PenetrationPower *= Math.round(ammoConfig.penetrationPowerMultiplier);
-                ammo127x55._props.ArmorDamage *= Math.round(ammoConfig.armorDamageMultiplier);
-            }
-            for(const ammo762x39 of all762x39){
-                ammo762x39._props.Damage *= Math.round(ammoConfig.damageMultiplier);
-                ammo762x39._props.PenetrationPower *= Math.round(ammoConfig.penetrationPowerMultiplier);
-                ammo762x39._props.ArmorDamage *= Math.round(ammoConfig.armorDamageMultiplier);
-            }
-            
-            log("[Not So Realistic] Ammo changes applied!", miscConfig.enableLogs, LogTextColor.GREEN);
-            
-        } else { 
-            log("[Not So Realistic] Ammo changes disabled!", miscConfig.enableLogs, LogTextColor.GREEN);
-            
-        }
-        //#endregion
-
-        //#region Recoil Changes
-        // Changes in the Recoil of the weapons ------------------------------------------------
-        if(recoilConfig.changes){
-            tables.globals.config.Aiming.RecoilCrank = recoilConfig.recoilCrank;
-            tables.globals.config.Aiming.RecoilDamping = recoilConfig.recoilDamping;
-            tables.globals.config.Aiming.RecoilHandDamping = recoilConfig.recoilHandDamping;
-            tables.globals.config.Aiming.RecoilVertBonus = 10;
-            tables.globals.config.Aiming.RecoilBackBonus = 10;
-
-            for (const weapons of Object.values(tables.templates.items)) {
-                if(weapons._props.hasOwnProperty('weapClass')) {
-                    const weapClass = weapons._props.weapClass;
-                    const type = weapons._type;
-                    if(weapClass == "" || weapClass == null || type == "Node"){
-                        continue;
-                    } else {
-
-                        if(weapons._props.weapFireType.includes("doubleaction") && qolConfig.enable){
-                            weapons._props.DoubleActionAccuracyPenalty = qolConfig.doubleActionAccuracyPenalty;
-                            log(`[Not So Realistic] Changing the Double Action Accuracy Penalty from ${weapons._name} to ${qolConfig.doubleActionAccuracyPenalty}`, miscConfig.enableLogs, LogTextColor.GREEN);
-                        }
-
-                        const recoilConfigMap = {
-                            smg: {
-                                RecoilUp: recoilConfig.smgRecoilUp,
-                                RecoilBack: recoilConfig.smgRecoilBack,
-                                RecoilConvergence: recoilConfig.smgRecoilConvergence,
-                                Dispersion: recoilConfig.smgDispersion,
-                                RecoilHandDamping: recoilConfig.recoilHandDamping,
-                                RecoilCamera: recoilConfig.smgRecoilCamera,
-                                RecoilCategoryMultiplierHandRotation: recoilConfig.smgRecoilCategoryMultiplierHandRotation,
-                                RecoilStableAngleIncreaseStep: recoilConfig.smgRecoilStableAngleIncreaseStep
-                            },
-                            assaultRifle: {
-                                RecoilUp: recoilConfig.assaultRifleRecoilUp,
-                                RecoilBack: recoilConfig.assaultRifleRecoilBack,
-                                RecoilConvergence: recoilConfig.assaultRifleRecoilConvergence,
-                                Dispersion: recoilConfig.assaultRifleDispersion,
-                                RecoilHandDamping: recoilConfig.recoilHandDamping,
-                                RecoilCamera: recoilConfig.assaultRifleRecoilCamera,
-                                RecoilCategoryMultiplierHandRotation: recoilConfig.assaultRifleRecoilCategoryMultiplierHandRotation,
-                                RecoilStableAngleIncreaseStep: recoilConfig.assaultRifleRecoilStableAngleIncreaseStep
-                            },
-                            assaultCarbine: {
-                                RecoilUp: recoilConfig.assaultCarbineRecoilUp,
-                                RecoilBack: recoilConfig.assaultCarbineRecoilBack,
-                                RecoilConvergence: recoilConfig.assaultCarbineRecoilConvergence,
-                                Dispersion: recoilConfig.assaultCarbineDispersion,
-                                RecoilHandDamping: recoilConfig.recoilHandDamping,
-                                RecoilCamera: recoilConfig.assaultCarbineRecoilCamera,
-                                RecoilCategoryMultiplierHandRotation: recoilConfig.assaultCarbineRecoilCategoryMultiplierHandRotation,
-                                RecoilStableAngleIncreaseStep: recoilConfig.assaultCarbineRecoilStableAngleIncreaseStep
-                            },
-                            sniperRifle: {
-                                RecoilUp: recoilConfig.sniperRifleRecoilUp,
-                                RecoilBack: recoilConfig.sniperRifleRecoilBack,
-                                RecoilConvergence: recoilConfig.sniperRifleRecoilConvergence,
-                                Dispersion: recoilConfig.sniperRifleDispersion,
-                                RecoilHandDamping: recoilConfig.recoilHandDamping,
-                                RecoilCamera: recoilConfig.sniperRifleRecoilCamera,
-                                RecoilCategoryMultiplierHandRotation: recoilConfig.sniperRifleRecoilCategoryMultiplierHandRotation,
-                                RecoilStableAngleIncreaseStep: recoilConfig.sniperRifleRecoilStableAngleIncreaseStep
-                            },
-                            marksmanRifle: {
-                                RecoilUp: recoilConfig.marksmanRifleRecoilUp,
-                                RecoilBack: recoilConfig.marksmanRifleRecoilBack,
-                                RecoilConvergence: recoilConfig.marksmanRifleRecoilConvergence,
-                                Dispersion: recoilConfig.marksmanRifleDispersion,
-                                RecoilHandDamping: recoilConfig.recoilHandDamping,
-                                RecoilCamera: recoilConfig.marksmanRifleRecoilCamera,
-                                RecoilCategoryMultiplierHandRotation: recoilConfig.marksmanRifleRecoilCategoryMultiplierHandRotation,
-                                RecoilStableAngleIncreaseStep: recoilConfig.marksmanRifleRecoilStableAngleIncreaseStep
-                            },
-                            pistol: {
-                                RecoilUp: recoilConfig.pistolRecoilUp,
-                                RecoilBack: recoilConfig.pistolRecoilBack,
-                                RecoilConvergence: recoilConfig.pistolRecoilConvergence,
-                                Dispersion: recoilConfig.pistolDispersion,
-                                RecoilHandDamping: recoilConfig.recoilHandDamping,
-                                RecoilCamera: recoilConfig.pistolRecoilCamera,
-                                RecoilCategoryMultiplierHandRotation: recoilConfig.pistolRecoilCategoryMultiplierHandRotation,
-                                RecoilStableAngleIncreaseStep: recoilConfig.pistolRecoilStableAngleIncreaseStep
-                            },
-                            machinegun: {
-                                RecoilUp: recoilConfig.machinegunRecoilUp,
-                                RecoilBack: recoilConfig.machinegunRecoilBack,
-                                RecoilConvergence: recoilConfig.machinegunRecoilConvergence,
-                                Dispersion: recoilConfig.machinegunDispersion,
-                                RecoilHandDamping: recoilConfig.recoilHandDamping,
-                                RecoilCamera: recoilConfig.machinegunRecoilCamera,
-                                RecoilCategoryMultiplierHandRotation: recoilConfig.machinegunRecoilCategoryMultiplierHandRotation,
-                                RecoilStableAngleIncreaseStep: recoilConfig.machinegunRecoilStableAngleIncreaseStep
-                            },
-                            shotgun: {
-                                RecoilUp: recoilConfig.shotgunRecoilUp,
-                                RecoilBack: recoilConfig.shotgunRecoilBack,
-                                RecoilConvergence: recoilConfig.shotgunRecoilConvergence,
-                                Dispersion: recoilConfig.shotgunDispersion,
-                                RecoilHandDamping: recoilConfig.recoilHandDamping,
-                                RecoilCamera: recoilConfig.shotgunRecoilCamera,
-                                RecoilCategoryMultiplierHandRotation: recoilConfig.shotgunRecoilCategoryMultiplierHandRotation,
-                                RecoilStableAngleIncreaseStep: recoilConfig.shotgunRecoilStableAngleIncreaseStep
-                            }
-                        };
-
-                        if (recoilConfigMap[weapClass]) {
-                            const config = recoilConfigMap[weapClass];
-                            log(`[Not So Realistic] Changing the recoil of ${weapons._name}`, miscConfig.enableLogs, LogTextColor.GREEN);
-                            weapons._props.RecoilForceUp *= (1 - config.RecoilUp);
-                            weapons._props.RecoilForceBack *= (1 - config.RecoilBack);
-                            weapons._props.RecoilReturnSpeedHandRotation *= (1 + config.RecoilConvergence);
-                            weapons._props.RecolDispersion *= (1 - config.Dispersion);
-                            weapons._props.RecoilDampingHandRotation *= (1 - config.RecoilHandDamping);
-                            weapons._props.RecoilCamera *= (1 - config.RecoilCamera);
-                            weapons._props.RecoilCategoryMultiplierHandRotation *= (1 - config.RecoilCategoryMultiplierHandRotation);
-                            weapons._props.RecoilStableAngleIncreaseStep *= (1 - config.RecoilStableAngleIncreaseStep);
-                        } else {
-                            log(`[Not So Realistic] ${weapons._name} is a ${weapClass}. Ignoring...`, miscConfig.enableLogs, LogTextColor.YELLOW);
-                        }
-                    }
-                }
-            }
-            log("[Not So Realistic] Weapon recoil changes applied!", miscConfig.enableLogs, LogTextColor.GREEN);
-        } else {
-            log("[Not So Realistic] All weapon recoil settings remain default. No changes applied.", miscConfig.enableLogs, LogTextColor.YELLOW);
-        }
-        log("========================================================================================", miscConfig.enableLogs, LogTextColor.GREEN);
-        //#endregion
-        
-        //#region DB Stuff
-
-        // Thanks TRON <3
+    preSptLoad(container: DependencyContainer): void {
         const logger = container.resolve<ILogger>("WinstonLogger");
-        const db = container.resolve<DatabaseServer>("DatabaseServer").getTables();
-        const ImporterUtil = container.resolve<ImporterUtil>("ImporterUtil");
-        const JsonUtil = container.resolve<JsonUtil>("JsonUtil");
-        const VFS = container.resolve<VFS>("VFS");
-        const locales = db.locales.global;
-        const items = db.templates.items;
-        const handbook = db.templates.handbook.Items;
-        const modPath = path.resolve(__dirname.toString()).split(path.sep).join("/")+"/";
+        logger.logWithColor(`${this.MOD_NAME}: Loading...`, LogTextColor.GREEN);
+    }
 
-        const mydb = ImporterUtil.loadRecursive(`${modPath}../db/`);
+    public postDBLoad(container: DependencyContainer): void {
+        const logger = container.resolve<ILogger>("WinstonLogger");
+        
+        try {
+            const databaseServer = container.resolve<DatabaseServer>("DatabaseServer");
+            const tables = databaseServer.getTables();
+            const itemHelper = container.resolve<ItemHelper>("ItemHelper");
 
-        const itemPath = `${modPath}../db/templates/items/`;
-        const handbookPath = `${modPath}../db/templates/handbook/`;
+            // Apply all modifications
+            this.applyMedsChanges(tables, logger);
+            this.applyAmmoChanges(tables, itemHelper, logger);
+            this.applyRecoilChanges(tables, logger);
+            this.applyWeaponModifications(tables, logger);
+            this.loadCustomDatabase(container);
 
-        const buffs = db.globals.config.Health.Effects.Stimulator.Buffs
+            logger.logWithColor(`${this.MOD_NAME}: Loading complete.`, LogTextColor.GREEN);
+        } catch (error) {
+            logger.error(`${this.MOD_NAME}: Error during loading: ${error}`);
+        }
+    }
 
-        //ID buff paracetamol -> 67150653e2809bdac7054f97
-        //ID buff exodrine    -> 673780fffa6d1a8ee8c3c405
+    private applyMedsChanges(tables: any, logger: ILogger): void {
+        if (!medsConfig.enable) {
+            this.log("Meds changes disabled!", miscConfig.enableLogs, LogTextColor.YELLOW, logger);
+            return;
+        }
 
-        buffs["67150653e2809bdac7054f97"] = paracetamol;
-        buffs["673780fffa6d1a8ee8c3c405"] = exodrine;
+        const items = tables.templates.items;
+        
+        // Get med items
+        const medItems = {
+            carKit: items[this.idHelper.CAR_FIRST_AID],
+            salewa: items[this.idHelper.SALEWA],
+            ifak: items[this.idHelper.IFAK],
+            afak: items[this.idHelper.AFAK],
+            grizzly: items[this.idHelper.GRIZZLY],
+            ai2: items[this.idHelper.AI2_MEDKIT],
+            calocB: items[this.idHelper.CALOC_B],
+            armyBandages: items[this.idHelper.ARMY_BANDAGE],
+            analginPainkillers: items[this.idHelper.ANALGIN],
+            augmentin: items[this.idHelper.AUGMENTIN],
+            ibuprofen: items[this.idHelper.IBUPROFEN],
+            vaselin: items[this.idHelper.VASELIN],
+            goldenStar: items[this.idHelper.GOLDEN_STAR],
+            aluminiumSplint: items[this.idHelper.ALUMINIUM_SPLINT],
+            survivalKit: items[this.idHelper.SURVIVAL_KIT],
+            cms: items[this.idHelper.CMS]
+        };
 
+        // Apply med changes
+        this.processMedItem(medItems.grizzly, "grizzly", medsConfig.grizzlyHP, medsConfig.grizzlyChanges, logger);
+        this.processMedItem(medItems.ai2, "ai2", medsConfig.ai2HP, medsConfig.ai2Changes, logger);
+        this.processMedItem(medItems.carKit, "carKit", medsConfig.carKitHP, medsConfig.carKitChanges, logger);
+        this.processMedItem(medItems.salewa, "salewa", medsConfig.salewaHP, medsConfig.salewaChanges, logger);
+        this.processMedItem(medItems.ifak, "ifak", medsConfig.ifakHP, medsConfig.ifakChanges, logger);
+        this.processMedItem(medItems.afak, "afak", medsConfig.afakHP, medsConfig.afakChanges, logger);
 
-        for(const itemFile in mydb.templates.items) {
-            const item = JsonUtil.deserialize(VFS.readFile(`${itemPath}${itemFile}.json`));
-            const hb = JsonUtil.deserialize(VFS.readFile(`${handbookPath}${itemFile}.json`));
+        // Apply usage changes to other meds
+        this.applyUsageChanges(medItems, logger);
 
-            const itemId = item._id;
-            //logger.info(itemId);
+        this.log("Meds changes applied!", miscConfig.enableLogs, LogTextColor.GREEN, logger);
+    }
 
-            items[itemId] = item;
-            //logger.info(hb.ParentId);
-            //logger.info(hb.Price);
-            handbook.push({
-                "Id": itemId,
-                "ParentId": hb.ParentId,
-                "Price": hb.Price
+    private processMedItem(item: ITemplateItem, prefix: string, hp: number, enabled: boolean, logger: ILogger): void {
+        if (enabled) {
+            this.applyMedChanges(item, medsConfig, prefix);
+            item._props.MaxHpResource = hp;
+            this.log(`Changing ${item._name}`, miscConfig.enableLogs, LogTextColor.GREEN, logger);
+        } else {
+            this.setDefaultMedValues(item, prefix);
+            this.log(`${item._name} set to default`, miscConfig.enableLogs, LogTextColor.GREEN, logger);
+        }
+    }
+
+    private applyMedChanges(item: any, config: any, prefix: string): void {
+        const effects = [
+            { effect: "Fracture", canHeal: `${prefix}CanHealFractures`, costKey: `${prefix}FractureHealCost` },
+            { effect: "DestroyedPart", canHeal: `${prefix}CanDoSurgery`, costKey: `${prefix}SurgeryCost`, isSurgery: true },
+            { effect: "HeavyBleeding", canHeal: `${prefix}CanHealHeavyBleeding`, costKey: `${prefix}HeavyBleedingHealCost` },
+            { effect: "LightBleeding", canHeal: `${prefix}CanHealLightBleeding`, costKey: `${prefix}LightBleedingHealCost` },
+        ];
+
+        effects.forEach(({ effect, canHeal, costKey, isSurgery }) => {
+            if (config[canHeal]) {
+                if (isSurgery) {
+                    this.setSurgeryEffect(item, costKey, config);
+                } else {
+                    this.setEffectDamage(item, effect, costKey, config);
+                }
+            } else {
+                this.removeEffect(item, effect);
+            }
+        });
+    }
+
+    private setEffectDamage(item: any, effect: string, configKey: string, config: any): void {
+        if (config[configKey]) {
+            item._props.effects_damage[effect] = {
+                delay: 0,
+                duration: 0,
+                fadeOut: 0,
+                cost: config[configKey]
+            };
+        }
+    }
+
+    private removeEffect(item: any, effect: string): void {
+        delete item._props.effects_damage[effect];
+    }
+
+    private setSurgeryEffect(item: any, configKey: string, config: any): void {
+        if (config[configKey]) {
+            item._props.effects_damage["DestroyedPart"] = {
+                delay: 0,
+                duration: 0,
+                fadeOut: 0,
+                healthPenaltyMin: 60,
+                healthPenaltyMax: 72,
+                cost: config[configKey]
+            };
+        }
+    }
+
+    private setDefaultMedValues(item: any, type: string): void {
+        // Set default values based on med type
+        const defaultValues = {
+            grizzly: { hp: 1800, effects: { LightBleeding: 40, HeavyBleeding: 130, Fracture: 50, Contusion: 0, RadExposure: 0 } },
+            ai2: { hp: 100, effects: { RadExposure: 0 } },
+            carKit: { hp: 220, effects: { LightBleeding: 50 } },
+            salewa: { hp: 400, effects: { LightBleeding: 45, HeavyBleeding: 175 } },
+            ifak: { hp: 300, effects: { LightBleeding: 30, HeavyBleeding: 210, RadExposure: 0 } },
+            afak: { hp: 400, effects: { LightBleeding: 30, HeavyBleeding: 170, RadExposure: 0 } }
+        };
+
+        if (defaultValues[type]) {
+            item._props.MaxHpResource = defaultValues[type].hp;
+            Object.entries(defaultValues[type].effects).forEach(([effect, cost]) => {
+                item._props.effects_damage[effect] = {
+                    delay: 0,
+                    duration: 0,
+                    fadeOut: 0,
+                    cost: cost
+                };
             });
         }
-        for (const trader in mydb.traders.assort) {
-            const traderAssort = db.traders[trader].assort
-            
-            for (const item of mydb.traders.assort[trader].items) {
-                traderAssort.items.push(item);
-            }
-    
-            for (const bc in mydb.traders.assort[trader].barter_scheme) {
-                traderAssort.barter_scheme[bc] = mydb.traders.assort[trader].barter_scheme[bc];
-            }
-    
-            for (const level in mydb.traders.assort[trader].loyal_level_items) {
-                traderAssort.loyal_level_items[level] = mydb.traders.assort[trader].loyal_level_items[level];
-            }
-        }
-        //logger.info("Test");
-        // default localization
-        for (const localeID in locales)
-        {
-            for (const id in mydb.locales.en.templates) {
-                const item = mydb.locales.en.templates[id];
-                //logger.info(item);
-                for(const locale in item) {
-                    //logger.info(locale);
-                    //logger.info(item[locale]);
-                    //logger.info(`${id} ${locale}`);
-                    locales[localeID][`${id} ${locale}`] = item[locale];
-                }
-            }
+    }
 
-            for (const id in mydb.locales.en.preset) {
-                const item = mydb.locales.en.preset[id];
-                for(const locale in item) {
-                    //logger.info(`${id} ${locale}`);
-                    locales[localeID][`${id}`] = item[locale];
-                }
-            }
+    private applyUsageChanges(medItems: any, logger: ILogger): void {
+        medItems.calocB._props.MaxHpResource = medsConfig.calocUsage;
+        medItems.armyBandages._props.MaxHpResource = medsConfig.armyBandageUsage;
+        medItems.analginPainkillers._props.MaxHpResource = medsConfig.analginPainkillersUsage;
+        medItems.augmentin._props.MaxHpResource = medsConfig.augmentinUsage;
+        medItems.ibuprofen._props.MaxHpResource = medsConfig.ibuprofenUsage;
+        medItems.vaselin._props.MaxHpResource = medsConfig.vaselinUsage;
+        medItems.goldenStar._props.MaxHpResource = medsConfig.goldenStarUsage;
+        medItems.aluminiumSplint._props.MaxHpResource = medsConfig.aluminiumSplintUsage;
+        medItems.cms._props.MaxHpResource = medsConfig.cmsUsage;
+        medItems.survivalKit._props.MaxHpResource = medsConfig.survivalKitUsage;
+    }
+
+    private applyAmmoChanges(tables: any, itemHelper: ItemHelper, logger: ILogger): void {
+        if (!ammoConfig.enable) {
+            this.log("Ammo changes disabled!", miscConfig.enableLogs, LogTextColor.YELLOW, logger);
+            return;
         }
 
-        for (const localeID in mydb.locales)
-        {
-            for (const id in mydb.locales[localeID].templates) {
-                const item = mydb.locales[localeID].templates[id];
-                //logger.info(item);
-                for(const locale in item) {
-                    locales[localeID][`${id}`] = item[locale];
-                }
-            }
+        const items = Object.values(tables.templates.items);
+        const allAmmo = items.filter(x => itemHelper.isOfBaseclass(x._id, BaseClasses.AMMO));
+        const allArmor = items.filter(x => itemHelper.isOfBaseclass(x._id, BaseClasses.ARMOR));
 
-            for (const id in mydb.locales[localeID].preset) {
-                const item = mydb.locales[localeID].preset[id];
-                for(const locale in item) {
-                    //logger.info(`${id} ${locale}`);
-                    locales[localeID][`${id} ${locale}`] = item[locale];
-                }
+        // Apply blunt damage changes to armor
+        allArmor.forEach(armor => {
+            armor._props.BluntThroughput *= ammoConfig.bluntDamageMultiplier;
+        });
+
+        // Apply ammo changes by caliber
+        Object.values(this.CALIBERS).forEach(caliber => {
+            const ammoOfCaliber = allAmmo.filter(x => x._props.Caliber === caliber);
+            this.modifyAmmoStats(ammoOfCaliber, ammoConfig);
+        });
+
+        this.log("Ammo changes applied!", miscConfig.enableLogs, LogTextColor.GREEN, logger);
+    }
+
+    private modifyAmmoStats(ammoArray: any[], config: any): void {
+        ammoArray.forEach(ammo => {
+            ammo._props.Damage *= Math.round(config.damageMultiplier);
+            ammo._props.PenetrationPower *= Math.round(config.penetrationPowerMultiplier);
+            ammo._props.ArmorDamage *= Math.round(config.armorDamageMultiplier);
+        });
+    }
+
+    private applyRecoilChanges(tables: any, logger: ILogger): void {
+        if (!recoilConfig.changes) {
+            this.log("All weapon recoil settings remain default. No changes applied.", miscConfig.enableLogs, LogTextColor.YELLOW, logger);
+            return;
+        }
+
+        // Apply global recoil settings
+        this.applyGlobalRecoilSettings(tables);
+
+        // Apply weapon-specific recoil changes
+        this.applyWeaponRecoilChanges(tables, logger);
+
+        this.log("Weapon recoil changes applied!", miscConfig.enableLogs, LogTextColor.GREEN, logger);
+    }
+
+    private applyGlobalRecoilSettings(tables: any): void {
+        const aimingConfig = tables.globals.config.Aiming;
+        aimingConfig.RecoilCrank = recoilConfig.recoilCrank;
+        aimingConfig.RecoilDamping = recoilConfig.recoilDamping;
+        aimingConfig.RecoilHandDamping = recoilConfig.recoilHandDamping;
+        aimingConfig.RecoilVertBonus = 10;
+        aimingConfig.RecoilBackBonus = 10;
+    }
+
+    private applyWeaponRecoilChanges(tables: any, logger: ILogger): void {
+        const recoilConfigMap = this.getRecoilConfigMap();
+
+        Object.values(tables.templates.items).forEach((weapon: any) => {
+            if (weapon._props?.hasOwnProperty('weapClass')) {
+                const weapClass = weapon._props.weapClass;
                 
-            }
+                if (!weapClass || weapClass === "" || weapon._type === "Node") {
+                    return;
+                }
 
+                // Check if weapon is excluded from recoil changes
+                if (this.RECOIL_EXCLUDED_WEAPONS.includes(weapon._id)) {
+                    this.log(`${weapon._name} (${weapon._id}) excluded from recoil changes`, miscConfig.enableLogs, LogTextColor.YELLOW, logger);
+                    return;
+                }
+
+                // Handle double action accuracy penalty
+                if (weapon._props.weapFireType?.includes("doubleaction") && qolConfig.enable) {
+                    weapon._props.DoubleActionAccuracyPenalty = qolConfig.doubleActionAccuracyPenalty;
+                    this.log(`Changing the Double Action Accuracy Penalty from ${weapon._name} to ${qolConfig.doubleActionAccuracyPenalty}`, miscConfig.enableLogs, LogTextColor.GREEN, logger);
+                }
+
+                // Apply recoil changes
+                if (recoilConfigMap[weapClass]) {
+                    this.applyWeaponRecoilConfig(weapon, recoilConfigMap[weapClass], logger);
+                } else {
+                    this.log(`${weapon._name} is a ${weapClass}. Ignoring...`, miscConfig.enableLogs, LogTextColor.YELLOW, logger);
+                }
+            }
+        });
+    }
+
+    private getRecoilConfigMap(): any {
+        return {
+            smg: {
+                RecoilUp: recoilConfig.smgRecoilUp,
+                RecoilBack: recoilConfig.smgRecoilBack,
+                RecoilConvergence: recoilConfig.smgRecoilConvergence,
+                Dispersion: recoilConfig.smgDispersion,
+                RecoilHandDamping: recoilConfig.recoilHandDamping,
+                RecoilCamera: recoilConfig.smgRecoilCamera,
+                RecoilCategoryMultiplierHandRotation: recoilConfig.smgRecoilCategoryMultiplierHandRotation,
+                RecoilStableAngleIncreaseStep: recoilConfig.smgRecoilStableAngleIncreaseStep
+            },
+            assaultRifle: {
+                RecoilUp: recoilConfig.assaultRifleRecoilUp,
+                RecoilBack: recoilConfig.assaultRifleRecoilBack,
+                RecoilConvergence: recoilConfig.assaultRifleRecoilConvergence,
+                Dispersion: recoilConfig.assaultRifleDispersion,
+                RecoilHandDamping: recoilConfig.recoilHandDamping,
+                RecoilCamera: recoilConfig.assaultRifleRecoilCamera,
+                RecoilCategoryMultiplierHandRotation: recoilConfig.assaultRifleRecoilCategoryMultiplierHandRotation,
+                RecoilStableAngleIncreaseStep: recoilConfig.assaultRifleRecoilStableAngleIncreaseStep
+            },
+            assaultCarbine: {
+                RecoilUp: recoilConfig.assaultCarbineRecoilUp,
+                RecoilBack: recoilConfig.assaultCarbineRecoilBack,
+                RecoilConvergence: recoilConfig.assaultCarbineRecoilConvergence,
+                Dispersion: recoilConfig.assaultCarbineDispersion,
+                RecoilHandDamping: recoilConfig.recoilHandDamping,
+                RecoilCamera: recoilConfig.assaultCarbineRecoilCamera,
+                RecoilCategoryMultiplierHandRotation: recoilConfig.assaultCarbineRecoilCategoryMultiplierHandRotation,
+                RecoilStableAngleIncreaseStep: recoilConfig.assaultCarbineRecoilStableAngleIncreaseStep
+            },
+            sniperRifle: {
+                RecoilUp: recoilConfig.sniperRifleRecoilUp,
+                RecoilBack: recoilConfig.sniperRifleRecoilBack,
+                RecoilConvergence: recoilConfig.sniperRifleRecoilConvergence,
+                Dispersion: recoilConfig.sniperRifleDispersion,
+                RecoilHandDamping: recoilConfig.recoilHandDamping,
+                RecoilCamera: recoilConfig.sniperRifleRecoilCamera,
+                RecoilCategoryMultiplierHandRotation: recoilConfig.sniperRifleRecoilCategoryMultiplierHandRotation,
+                RecoilStableAngleIncreaseStep: recoilConfig.sniperRifleRecoilStableAngleIncreaseStep
+            },
+            marksmanRifle: {
+                RecoilUp: recoilConfig.marksmanRifleRecoilUp,
+                RecoilBack: recoilConfig.marksmanRifleRecoilBack,
+                RecoilConvergence: recoilConfig.marksmanRifleRecoilConvergence,
+                Dispersion: recoilConfig.marksmanRifleDispersion,
+                RecoilHandDamping: recoilConfig.recoilHandDamping,
+                RecoilCamera: recoilConfig.marksmanRifleRecoilCamera,
+                RecoilCategoryMultiplierHandRotation: recoilConfig.marksmanRifleRecoilCategoryMultiplierHandRotation,
+                RecoilStableAngleIncreaseStep: recoilConfig.marksmanRifleRecoilStableAngleIncreaseStep
+            },
+            pistol: {
+                RecoilUp: recoilConfig.pistolRecoilUp,
+                RecoilBack: recoilConfig.pistolRecoilBack,
+                RecoilConvergence: recoilConfig.pistolRecoilConvergence,
+                Dispersion: recoilConfig.pistolDispersion,
+                RecoilHandDamping: recoilConfig.recoilHandDamping,
+                RecoilCamera: recoilConfig.pistolRecoilCamera,
+                RecoilCategoryMultiplierHandRotation: recoilConfig.pistolRecoilCategoryMultiplierHandRotation,
+                RecoilStableAngleIncreaseStep: recoilConfig.pistolRecoilStableAngleIncreaseStep
+            },
+            machinegun: {
+                RecoilUp: recoilConfig.machinegunRecoilUp,
+                RecoilBack: recoilConfig.machinegunRecoilBack,
+                RecoilConvergence: recoilConfig.machinegunRecoilConvergence,
+                Dispersion: recoilConfig.machinegunDispersion,
+                RecoilHandDamping: recoilConfig.recoilHandDamping,
+                RecoilCamera: recoilConfig.machinegunRecoilCamera,
+                RecoilCategoryMultiplierHandRotation: recoilConfig.machinegunRecoilCategoryMultiplierHandRotation,
+                RecoilStableAngleIncreaseStep: recoilConfig.machinegunRecoilStableAngleIncreaseStep
+            },
+            shotgun: {
+                RecoilUp: recoilConfig.shotgunRecoilUp,
+                RecoilBack: recoilConfig.shotgunRecoilBack,
+                RecoilConvergence: recoilConfig.shotgunRecoilConvergence,
+                Dispersion: recoilConfig.shotgunDispersion,
+                RecoilHandDamping: recoilConfig.recoilHandDamping,
+                RecoilCamera: recoilConfig.shotgunRecoilCamera,
+                RecoilCategoryMultiplierHandRotation: recoilConfig.shotgunRecoilCategoryMultiplierHandRotation,
+                RecoilStableAngleIncreaseStep: recoilConfig.shotgunRecoilStableAngleIncreaseStep
+            }
+        };
+    }
+
+    private applyWeaponRecoilConfig(weapon: any, config: any, logger: ILogger): void {
+        this.log(`Changing the recoil of ${weapon._name}`, miscConfig.enableLogs, LogTextColor.GREEN, logger);
+        
+        weapon._props.RecoilForceUp *= (1 - config.RecoilUp);
+        weapon._props.RecoilForceBack *= (1 - config.RecoilBack);
+        weapon._props.RecoilReturnSpeedHandRotation *= (1 + config.RecoilConvergence);
+        weapon._props.RecolDispersion *= (1 - config.Dispersion);
+        weapon._props.RecoilDampingHandRotation *= (1 - config.RecoilHandDamping);
+        weapon._props.RecoilCamera *= (1 - config.RecoilCamera);
+        weapon._props.RecoilCategoryMultiplierHandRotation *= (1 - config.RecoilCategoryMultiplierHandRotation);
+        weapon._props.RecoilStableAngleIncreaseStep *= (1 - config.RecoilStableAngleIncreaseStep);
+    }
+
+    private applyWeaponModifications(tables: any, logger: ILogger): void {
+        const items = tables.templates.items;
+
+        // KRISS Vector 9mm modifications
+        const kriss9mm = items[this.idHelper.KRISS_VECTOR_9MM];
+        if (kriss9mm) {
+            kriss9mm._props.bFirerate = 1100;
         }
 
-        //#endregion
+        // Alpha Dog Suppressor 9mm modifications
+        const alphaDogSuppressor = items[this.idHelper.ALPHA_DOG_ALPHA_SUPRESSOR_9MM];
+        if (alphaDogSuppressor) {
+            alphaDogSuppressor._props.Slots[0]._props.filters[0].Filter.push(...this.WEAPON_MODS.SCOPES_TO_ADD);
+        }
 
+        // RPD modifications
+        const rpd520mm = items[this.idHelper.RPD_520mm];
+        const rpdSawedOff = items[this.idHelper.RPD_SAWED_OFF_350mm];
+        
+        if (rpd520mm) {
+            rpd520mm._props.Slots[1]._props.filters[0].Filter.push(...this.WEAPON_MODS.MUZZLES_TO_ADD);
+        }
+        
+        if (rpdSawedOff) {
+            rpdSawedOff._props.Slots[0]._props.filters[0].Filter.push(...this.WEAPON_MODS.MUZZLES_TO_ADD);
+        }
+
+        this.log("Weapon modifications applied!", miscConfig.enableLogs, LogTextColor.GREEN, logger);
+    }
+
+    private loadCustomDatabase(container: DependencyContainer): void {
+        const logger = container.resolve<ILogger>("WinstonLogger");
+        const db = container.resolve<DatabaseServer>("DatabaseServer").getTables();
+        const jsonUtil = container.resolve<JsonUtil>("JsonUtil");
+        
+        const modPath = path.resolve(__dirname, "../");
+        const dbPath = path.join(modPath, "db");
+        
+        if (!fs.existsSync(dbPath)) {
+            logger.warning(`${this.MOD_NAME}: Database folder not found at ${dbPath}`);
+            return;
+        }
+
+        try {
+            const customDb = this.loadRecursive(dbPath, jsonUtil, logger);
+            this.processCustomBuffs(db);
+            this.processCustomItems(customDb, db, jsonUtil);
+            this.processTraderAssorts(customDb, db);
+            this.processLocalizations(customDb, db);
+        } catch (error) {
+            logger.error(`${this.MOD_NAME}: Error loading custom database: ${error}`);
+        }
+    }
+
+    private processCustomBuffs(db: any): void {
+        const buffs = db.globals.config.Health.Effects.Stimulator.Buffs;
+        
+        // Add custom buffs
+        buffs["67150653e2809bdac7054f97"] = paracetamol;
+        buffs["673780fffa6d1a8ee8c3c405"] = exodrine;
+    }
+
+    private loadRecursive(dirPath: string, jsonUtil: JsonUtil, logger: ILogger): any {
+        const result: any = {};
+        
+        const loadDirectory = (currentPath: string, obj: any): void => {
+            if (!fs.existsSync(currentPath)) return;
+            
+            fs.readdirSync(currentPath).forEach(file => {
+                const fullPath = path.join(currentPath, file);
+                const stat = fs.statSync(fullPath);
+                
+                if (stat.isDirectory()) {
+                    obj[file] = {};
+                    loadDirectory(fullPath, obj[file]);
+                } else if (file.endsWith('.json')) {
+                    const fileName = file.replace('.json', '');
+                    try {
+                        obj[fileName] = jsonUtil.deserialize(fs.readFileSync(fullPath, 'utf8'));
+                    } catch (error) {
+                        logger.error(`${this.MOD_NAME}: Error loading ${fullPath}: ${error}`);
+                    }
+                }
+            });
+        };
+        
+        loadDirectory(dirPath, result);
+        return result;
+    }
+
+    private processCustomItems(customDb: any, db: any, jsonUtil: JsonUtil): void {
+        if (!customDb.templates?.items) return;
+
+        Object.keys(customDb.templates.items).forEach(itemFile => {
+            const item = customDb.templates.items[itemFile];
+            const handbook = customDb.templates.handbook?.[itemFile];
+            
+            if (item && handbook) {
+                db.templates.items[item._id] = item;
+                db.templates.handbook.Items.push({
+                    Id: item._id,
+                    ParentId: handbook.ParentId,
+                    Price: handbook.Price
+                });
+            }
+        });
+    }
+
+    private processTraderAssorts(customDb: any, db: any): void {
+        if (!customDb.traders?.assort) return;
+
+        Object.keys(customDb.traders.assort).forEach(traderId => {
+            const traderAssort = db.traders[traderId]?.assort;
+            const customAssort = customDb.traders.assort[traderId];
+            
+            if (traderAssort && customAssort) {
+                if (customAssort.items) traderAssort.items.push(...customAssort.items);
+                if (customAssort.barter_scheme) Object.assign(traderAssort.barter_scheme, customAssort.barter_scheme);
+                if (customAssort.loyal_level_items) Object.assign(traderAssort.loyal_level_items, customAssort.loyal_level_items);
+            }
+        });
+    }
+
+    private processLocalizations(customDb: any, db: any): void {
+        if (!customDb.locales) return;
+
+        const locales = db.locales.global;
+        
+        // Process default English localization
+        if (customDb.locales.en) {
+            Object.keys(locales).forEach(localeId => {
+                this.processLocaleData(customDb.locales.en, locales[localeId]);
+            });
+        }
+
+        // Process specific localizations
+        Object.keys(customDb.locales).forEach(localeKey => {
+            if (localeKey !== 'en' && locales[localeKey]) {
+                this.processLocaleData(customDb.locales[localeKey], locales[localeKey]);
+            }
+        });
+    }
+
+    private processLocaleData(sourceLocale: any, targetLocale: any): void {
+        if (sourceLocale.templates) {
+            Object.keys(sourceLocale.templates).forEach(id => {
+                const item = sourceLocale.templates[id];
+                Object.keys(item).forEach(key => {
+                    targetLocale[`${id} ${key}`] = item[key];
+                });
+            });
+        }
+
+        if (sourceLocale.preset) {
+            Object.keys(sourceLocale.preset).forEach(id => {
+                const item = sourceLocale.preset[id];
+                Object.keys(item).forEach(key => {
+                    targetLocale[id] = item[key];
+                });
+            });
+        }
+    }
+
+    private log(text: string, enable: boolean, color: LogTextColor, logger: ILogger): void {
+        if (enable) {
+            logger.logWithColor(`${this.MOD_NAME}: ${text}`, color);
+        }
     }
 }
 
-module.exports = { mod: new Mod() }
+module.exports = { mod: new Mod() };
